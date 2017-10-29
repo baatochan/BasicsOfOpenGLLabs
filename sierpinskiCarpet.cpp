@@ -4,59 +4,34 @@
 #include <iostream> //dla cout/cin
 #include <gl/gl.h>
 #include <gl/glut.h>
-#include <stdlib.h> // dla rand
-#include <time.h> //dla time
 
-int deformacja = 0; // Poziom deformacji dywanu (0-20)
-int stopienRekurencji = 1; // Ilosc krokow dywanu do narysowania (0-5)
+using namespace std;
 
-float randomOffset(float bokKwadratu) {
-    if (deformacja == 0) return 0;
-    int randomValue = 2 * (rand() - (RAND_MAX / 2)); // losowa liczba z zakresu [-RAND_MAX, RAND_MAX]
-    float dzielnik = (float)RAND_MAX / 2 * bokKwadratu;
-    float przesuniecie = ((float)randomValue * deformacja) / dzielnik;
-    return przesuniecie;
-}
+int perturbationLevel; // Poziom deformacji dywanu (0-20)
+int numberOfStepsToDraw; // Ilosc krokow dywanu do narysowania (0-5)
+bool askUser; // Czy pytac użytwkownika o wartosci powyzszych zmiennych
 
 // Rekurencyjna funkcja rysujaca dywan
-void rysujDywan(int stopienRekurencji, point2 lewyGornyRog, point2 prawyDolnyRog) {
-    float bokKwadratu = abs(lewyGornyRog[0] - prawyDolnyRog[0]);
-    std::cout << bokKwadratu << " " << stopienRekurencji << std::endl;
-    if (stopienRekurencji == 0) {
-        point2 ZdefLewyGornyRog = { lewyGornyRog[0] + randomOffset(bokKwadratu), lewyGornyRog[1] + randomOffset(bokKwadratu) };
-        point2 ZdefPrawyGornyRog = { prawyDolnyRog[0] + randomOffset(bokKwadratu), lewyGornyRog[1] + randomOffset(bokKwadratu) };
-        point2 ZdefLewyDolnyRog = { lewyGornyRog[0] + randomOffset(bokKwadratu), prawyDolnyRog[1] + randomOffset(bokKwadratu) };
-        point2 ZdefPrawyDolnyRog = { prawyDolnyRog[0] + randomOffset(bokKwadratu), prawyDolnyRog[1] + randomOffset(bokKwadratu) };
-
+void drawCarpet(int numberOfStepsToDraw, point2 leftTopCorner, point2 rightBottomCorner) {
+    float sideOfSquare = 
+    if (numberOfStepsToDraw == 0) {
+        point2 finalLeftTopCorner = { leftTopCorner[0], leftTopCorner[1] };
+        point2 finalRightTopCorner = { rightBottomCorner[0], leftTopCorner[1] };
+        point2 finalLeftBottomCorner = { leftTopCorner[0], rightBottomCorner[1] };
+        point2 finalRightBottomCorner = { rightBottomCorner[0], rightBottomCorner[1] };
 
         glBegin(GL_QUADS);
-        glVertex2fv(ZdefPrawyGornyRog);
-        glVertex2fv(ZdefPrawyDolnyRog);
-        glVertex2fv(ZdefLewyDolnyRog);
-        glVertex2fv(ZdefLewyGornyRog);
-        /*glVertex2f(80, 80);
-        glVertex2f(80, -80);
-        glVertex2f(-80, -80);
-        glVertex2f(-80, 80);*/
+            glVertex2fv(finalRightTopCorner);
+            glVertex2fv(finalRightBottomCorner);
+            glVertex2fv(finalLeftBottomCorner);
+            glVertex2fv(finalLeftTopCorner);
         glEnd();
-    }
-    else {
-        stopienRekurencji--;
-        point2 lewyMniejszego;
-        point2 prawyMniejszego;
-        for (int i = 0; i < 3; i++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                if (i == 1 && j == 1) continue;
-                lewyMniejszego[0] = lewyGornyRog[0] + j * bokKwadratu / 3;
-                lewyMniejszego[1] = lewyGornyRog[1] + i * bokKwadratu / 3;
-                prawyMniejszego[0] = (prawyDolnyRog[0] - 2 * bokKwadratu) + j * bokKwadratu / 3;
-                prawyMniejszego[1] = (prawyDolnyRog[1] - 2 * bokKwadratu) + i * bokKwadratu / 3;
-                std::cout << lewyMniejszego[0] << " " << lewyMniejszego[1] << " " << prawyMniejszego[0] << " " << prawyMniejszego[1] << std::endl;
-                rysujDywan(stopienRekurencji, lewyMniejszego, prawyMniejszego);
-            }
-        }
+    } else if (numberOfStepsToDraw < 0) {
+        cout<<"Cos jest nie tak. Aplikacja nie moze kontynuowac."<<endl;
+        return;
+    } else {
+        numberOfStepsToDraw--;
+
     }
 }
 
@@ -68,10 +43,10 @@ void RenderScene(void)
 
     glColor3f(1.0f, 0.0f, 0.0f); // TODO: random color
 
-    point2 lewyGornyRog = { -80.0f, 80.0f };
-    point2 prawyDolnyRog = { 80.0f, -80.0f };
+    point2 leftTopCorner = { -80.0f, 80.0f };
+    point2 rightBottomCorner = { 80.0f, -80.0f };
 
-    rysujDywan(stopienRekurencji, lewyGornyRog, prawyDolnyRog);
+    drawCarpet(numberOfStepsToDraw, leftTopCorner, rightBottomCorner);
 
     glFlush(); // Przekazanie poleceń rysujących do wykonania
 }
@@ -123,21 +98,24 @@ void ChangeSize(GLsizei horizontal, GLsizei vertical)
 // Główny punkt wejścia programu. Program działa w trybie konsoli
 int main(int argc, char* argv[])
 {
-    /*// Ukrycvie okna konsoli
-    HWND con = GetConsoleWindow();
-    ShowWindow(con, SW_HIDE);*/
-    /*srand(time(0)); // ziarno dla liczb pseudo losowych
+    // srand(time(0)); // ziarno dla liczb pseudo losowych
+    askUser = false;
 
-    do {
-        std::cout << "Podaj stopien zdeformowania (0-20):";
-        std::cin >> deformacja;
-    } while (deformacja < 0 || deformacja > 20);
+    if (askUser) {
+        do {
+            cout << "Podaj stopien zdeformowania (0-20):";
+            cin >> perturbationLevel;
+        } while (perturbationLevel < 0 || perturbationLevel > 20);
 
-    do {
-        std::cout << "Podaj ilosc krokow (poziom rekurencji) (0-5):";
-        std::cin >> stopienRekurencji;
-    } while (stopienRekurencji < 0 || stopienRekurencji > 5);
-    */
+        do {
+            cout << "Podaj ilosc krokow (poziom rekurencji) (0-5):";
+            cin >> numberOfStepsToDraw;
+        } while (numberOfStepsToDraw < 0 || numberOfStepsToDraw > 5);
+    } else {
+        // Jesli chcesz podac dane bez pytania uzytkownika ustaw askUser na false i podaj tu dane
+        perturbationLevel = 0;
+        numberOfStepsToDraw = 0;
+    }
 
     glutInit(&argc, argv);
     
@@ -146,7 +124,7 @@ int main(int argc, char* argv[])
     // GLUT_SINGLE - pojedynczy bufor wyświetlania
     // GLUT_RGBA - model kolorów RGB
 
-    glutCreateWindow("Dywan Sierpińskiego z perturbacjami");
+    glutCreateWindow("Dywan Sierpinskiego z perturbacjami");
     // Utworzenie okna i określenie treści napisu w nagłówku okna
 
     glutDisplayFunc(RenderScene);
