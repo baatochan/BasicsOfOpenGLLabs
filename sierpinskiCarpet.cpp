@@ -4,12 +4,21 @@
 #include <iostream> //dla cout/cin
 #include <gl/gl.h>
 #include <gl/glut.h>
+#include <stdlib.h> // dla rand
+#include <time.h> //dla time
 
 using namespace std;
 
 int perturbationLevel; // Poziom deformacji dywanu (0-20)
 int numberOfStepsToDraw; // Ilosc krokow dywanu do narysowania (0-5)
 bool askUser; // Czy pytac użytwkownika o wartosci powyzszych zmiennych
+
+float getRandomColor() {
+    int random = rand() % 10000;
+    float color = (float)random / 10000;
+
+    return color;
+}
 
 // Rekurencyjna funkcja rysujaca dywan
 void drawCarpet(int numberOfStepsToDraw, point2 leftTopCorner, point2 rightBottomCorner) {
@@ -21,9 +30,16 @@ void drawCarpet(int numberOfStepsToDraw, point2 leftTopCorner, point2 rightBotto
         point2 finalRightBottomCorner = { rightBottomCorner[0], rightBottomCorner[1] };
 
         glBegin(GL_QUADS);
+            glColor3f(getRandomColor(), getRandomColor(), getRandomColor());
             glVertex2fv(finalRightTopCorner);
+
+            glColor3f(getRandomColor(), getRandomColor(), getRandomColor());
             glVertex2fv(finalRightBottomCorner);
+
+            glColor3f(getRandomColor(), getRandomColor(), getRandomColor());
             glVertex2fv(finalLeftBottomCorner);
+
+            glColor3f(getRandomColor(), getRandomColor(), getRandomColor());
             glVertex2fv(finalLeftTopCorner);
         glEnd();
 
@@ -63,7 +79,7 @@ void RenderScene(void)
 {
     glClear(GL_COLOR_BUFFER_BIT); // Czyszczenie okna aktualnym kolorem czyszczącym
 
-    glColor3f(1.0f, 0.0f, 0.0f); // TODO: random color
+    glColor3f(1.0f, 0.0f, 0.0f);
 
     point2 leftTopCorner = { -80.0f, 80.0f };
     point2 rightBottomCorner = { 80.0f, -80.0f };
@@ -120,7 +136,7 @@ void ChangeSize(GLsizei horizontal, GLsizei vertical)
 // Główny punkt wejścia programu. Program działa w trybie konsoli
 int main(int argc, char* argv[])
 {
-    // srand(time(0)); // ziarno dla liczb pseudo losowych
+    srand(time(0)); // ziarno dla liczb pseudo losowych
     askUser = false;
 
     if (askUser) {
