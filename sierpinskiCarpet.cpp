@@ -13,7 +13,7 @@ bool askUser; // Czy pytac użytwkownika o wartosci powyzszych zmiennych
 
 // Rekurencyjna funkcja rysujaca dywan
 void drawCarpet(int numberOfStepsToDraw, point2 leftTopCorner, point2 rightBottomCorner) {
-    float sideOfSquare = 
+    float sideOfSquare = rightBottomCorner[0] - leftTopCorner[0];
     if (numberOfStepsToDraw == 0) {
         point2 finalLeftTopCorner = { leftTopCorner[0], leftTopCorner[1] };
         point2 finalRightTopCorner = { rightBottomCorner[0], leftTopCorner[1] };
@@ -26,12 +26,34 @@ void drawCarpet(int numberOfStepsToDraw, point2 leftTopCorner, point2 rightBotto
             glVertex2fv(finalLeftBottomCorner);
             glVertex2fv(finalLeftTopCorner);
         glEnd();
+
+        return;
     } else if (numberOfStepsToDraw < 0) {
         cout<<"Cos jest nie tak. Aplikacja nie moze kontynuowac."<<endl;
         return;
     } else {
         numberOfStepsToDraw--;
-
+        point2 leftTopOfSmaller;
+        point2 rightBottomOfSmaller;
+        float sideOfSmallerSquare = sideOfSquare/3;
+        //cout<<sideOfSmallerSquare<<" "<<sideOfSquare<<endl;
+        //int xxx = 0;
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                //xxx++;
+                if (i == 1 && j == 1) continue;
+                leftTopOfSmaller[0] = leftTopCorner[0] + j * sideOfSmallerSquare;
+                leftTopOfSmaller[1] = leftTopCorner[1] - i * sideOfSmallerSquare;
+                rightBottomOfSmaller[0] = (rightBottomCorner[0] - sideOfSquare) + (j+1) * sideOfSmallerSquare;
+                rightBottomOfSmaller[1] = (rightBottomCorner[1] + sideOfSquare) - (i+1) * sideOfSmallerSquare;
+                //std::cout <<xxx<< " "<< rightBottomOfSmaller[0] << " " << rightBottomOfSmaller[1] << std::endl;
+                //std::cout <<xxx<< " "<< leftTopOfSmaller[0] << " " << leftTopOfSmaller[1] << " " << rightBottomOfSmaller[0] << " " << rightBottomOfSmaller[1] << std::endl;
+                drawCarpet(numberOfStepsToDraw, leftTopOfSmaller, rightBottomOfSmaller);
+            }
+        }
+        return;
     }
 }
 
@@ -114,7 +136,7 @@ int main(int argc, char* argv[])
     } else {
         // Jesli chcesz podac dane bez pytania uzytkownika ustaw askUser na false i podaj tu dane
         perturbationLevel = 0;
-        numberOfStepsToDraw = 0;
+        numberOfStepsToDraw = 3;
     }
 
     glutInit(&argc, argv);
