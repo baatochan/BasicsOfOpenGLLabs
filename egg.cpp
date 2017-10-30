@@ -7,14 +7,18 @@
 #include <gl/glut.h>
 #include <iostream>
 #include <cmath>
+#include <time.h> //dla time
 
-#define numberOfPoints 100
+#define numberOfPoints 20
 
 typedef float point3[3];
 /*************************************************************************************/
 
+static GLfloat theta[] = {-40, 85, 0}; // trzy kąty obrotu
+
 point3 eggCords[numberOfPoints][numberOfPoints];
-int model = 2;  // 1- punkty, 2- siatka, 3 - wypełnione trójkąty
+point3 eggCordsColors[numberOfPoints][numberOfPoints];
+int model = 3;  // 1- punkty, 2- siatka, 3 - wypełnione trójkąty
 
 using namespace std;
 
@@ -56,7 +60,25 @@ void countEggCords() {
     }
 }
 
-void egg() {
+// funckja zwracajaca losowa wartosc z zakresu [0,1]; przydatna do podawania losowych kolorow
+float getRandomColor() {
+    int random = rand() % 10001; //generuj losowa wartosc z zakresu [0, 10000]
+    float color = (float)random / 10000; // podziel na 10k, wiec zakres zmienia sie na [0,1]
+
+    return color;
+}
+
+void loadRandomColors() {
+    for (int i = 0; i < numberOfPoints; i++) {
+        for (int j = 0; j < numberOfPoints; j++) {
+            eggCordsColors[i][j][0] = getRandomColor();
+            eggCordsColors[i][j][1] = getRandomColor();
+            eggCordsColors[i][j][2] = getRandomColor();
+        }
+    }
+}
+
+void drawEgg() {
     if (model == 1) {
         glBegin(GL_POINTS);
         for (int i = 0; i < numberOfPoints; i++) {
@@ -92,10 +114,40 @@ void egg() {
             glEnd();
         }
     } else if (model == 3) {
+        int k = 0;
+        int l = 0;
+        for (int i = 0; i < numberOfPoints; i++) {
+            for (int j = 0; j < numberOfPoints; j++) {
+                k = j+1;
+                if (k >= numberOfPoints) k = 0;
+                l = i+1;
+                if (l >= numberOfPoints) l = 0;
 
+                glBegin(GL_TRIANGLES);
+                    glColor3fv(eggCordsColors[i][j]);
+                    glVertex3fv(eggCords[i][j]);
+
+                    glColor3fv(eggCordsColors[i][k]);
+                    glVertex3fv(eggCords[i][k]);
+
+                    glColor3fv(eggCordsColors[l][j]);
+                    glVertex3fv(eggCords[l][j]);
+                glEnd();
+                glBegin(GL_TRIANGLES);
+                    glColor3fv(eggCordsColors[i][k]);
+                    glVertex3fv(eggCords[i][k]);
+
+                    glColor3fv(eggCordsColors[l][j]);
+                    glVertex3fv(eggCords[l][j]);
+
+                    glColor3fv(eggCordsColors[l][k]);
+                    glVertex3fv(eggCords[l][k]);
+                glEnd();
+            }
+        }
     } else {
         model = 1;
-        egg();
+        drawEgg();
     }
 }
 
@@ -145,13 +197,34 @@ void RenderScene(void)
     Axes();
 // Narysowanie osi przy pomocy funkcji zdefiniowanej wyżej
 
-    egg();
+    glRotatef(theta[0], 1.0, 0.0, 0.0);
+
+    glRotatef(theta[1], 0.0, 1.0, 0.0);
+
+    glRotatef(theta[2], 0.0, 0.0, 1.0);
+
+    drawEgg();
 
     glFlush();
 // Przekazanie poleceń rysujących do wykonania
 
     glutSwapBuffers();
 //
+}
+
+void spinEgg()
+{
+
+    //theta[0] -= 0.5;
+    if( theta[0] > 360.0 ) theta[0] -= 360.0;
+
+    theta[1] -= 0.01;
+    if( theta[1] > 360.0 ) theta[1] -= 360.0;
+
+    //theta[2] -= 0.5;
+    if( theta[2] > 360.0 ) theta[2] -= 360.0;
+
+    glutPostRedisplay(); //odświeżenie zawartości aktualnego okna
 }
 
 void keys(unsigned char key, int x, int y)
@@ -212,6 +285,9 @@ void ChangeSize(GLsizei horizontal, GLsizei vertical )
 
 int main(int argc, char* argv[])
 {
+    srand(time(0)); // ziarno dla liczb pseudo losowych
+
+    loadRandomColors();
     countEggCords();
 
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB |GLUT_DEPTH);
@@ -231,6 +307,8 @@ int main(int argc, char* argv[])
 // zazmiany rozmiaru okna
 
     glutKeyboardFunc(keys);
+
+    //glutIdleFunc(spinEgg);
 
     MyInit();
 // Funkcja MyInit() (zdefiniowana powyżej) wykonuje wszelkie
