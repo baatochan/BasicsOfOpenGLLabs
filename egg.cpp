@@ -18,7 +18,7 @@ static GLfloat theta[] = {-40, 85, 0}; // trzy kąty obrotu
 
 point3 eggCords[numberOfPoints][numberOfPoints];
 point3 eggCordsColors[numberOfPoints][numberOfPoints];
-int model = 3;  // 1- punkty, 2- siatka, 3 - wypełnione trójkąty
+int model = 1;  // 1- punkty, 2- siatka, 3 - wypełnione trójkąty
 
 using namespace std;
 
@@ -53,9 +53,9 @@ void countEggCords() {
 
             z *= sin(M_PI * v);
 
-            eggCords[i][j][0] = x;
-            eggCords[i][j][1] = y;
-            eggCords[i][j][2] = z;
+            eggCords[j][i][0] = x;
+            eggCords[j][i][1] = y;
+            eggCords[j][i][2] = z;
         }
     }
 }
@@ -82,6 +82,9 @@ void drawEgg() {
     if (model == 1) {
         glBegin(GL_POINTS);
         for (int i = 0; i < numberOfPoints; i++) {
+            //glColor3f(getRandomColor(), getRandomColor(), getRandomColor());
+            if (i == 19) {glColor3f(0,1,0);}
+            else {glColor3f(1,0,0);}
             for (int j = 0; j < numberOfPoints; j++) {
                 glVertex3fv(eggCords[i][j]);
             }
@@ -91,13 +94,16 @@ void drawEgg() {
         int k = 0;
         for (int i = 0; i < numberOfPoints; i++) {
             glBegin(GL_LINES);
+            glColor3f(1, 0, 0);
             for (int j = 0; j < numberOfPoints; j++) {
                 glVertex3fv(eggCords[j][i]);
             }
             glEnd();
         }
         for (int i = 0; i < numberOfPoints; i++) {
+            if (i == numberOfPoints || (i == numberOfPoints/2 && numberOfPoints%2 == 0)) continue;
             glBegin(GL_LINES);
+            glColor3f(0, 1, 0);
             for (int j = 0; j < numberOfPoints; j++) {
                 glVertex3fv(eggCords[i][j]);
             }
@@ -105,6 +111,7 @@ void drawEgg() {
         }
         for (int i = 0; i < numberOfPoints; i++) {
             glBegin(GL_LINES);
+            glColor3f(0, 0, 1);
             for (int j = 0; j < numberOfPoints; j++) {
                 k = i-j;
                 if (k < 0)
@@ -215,13 +222,13 @@ void RenderScene(void)
 void spinEgg()
 {
 
-    //theta[0] -= 0.5;
+    theta[0] -= 0.01;
     if( theta[0] > 360.0 ) theta[0] -= 360.0;
 
     theta[1] -= 0.01;
     if( theta[1] > 360.0 ) theta[1] -= 360.0;
 
-    //theta[2] -= 0.5;
+    theta[2] -= 0.01;
     if( theta[2] > 360.0 ) theta[2] -= 360.0;
 
     glutPostRedisplay(); //odświeżenie zawartości aktualnego okna
@@ -308,7 +315,7 @@ int main(int argc, char* argv[])
 
     glutKeyboardFunc(keys);
 
-    //glutIdleFunc(spinEgg);
+    glutIdleFunc(spinEgg);
 
     MyInit();
 // Funkcja MyInit() (zdefiniowana powyżej) wykonuje wszelkie
