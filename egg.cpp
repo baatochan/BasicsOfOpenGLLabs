@@ -8,7 +8,7 @@
 #include <iostream>
 #include <cmath>
 
-#define numberOfPoints 20
+#define numberOfPoints 100
 
 typedef float point3[3];
 /*************************************************************************************/
@@ -66,6 +66,7 @@ void egg() {
         }
         glEnd();
     } else if (model == 2) {
+        int k = 0;
         for (int i = 0; i < numberOfPoints; i++) {
             glBegin(GL_LINES);
             for (int j = 0; j < numberOfPoints; j++) {
@@ -83,7 +84,10 @@ void egg() {
         for (int i = 0; i < numberOfPoints; i++) {
             glBegin(GL_LINES);
             for (int j = 0; j < numberOfPoints; j++) {
-                glVertex3fv(eggCords[i][j]);
+                k = i-j;
+                if (k < 0)
+                    k += numberOfPoints;
+                glVertex3fv(eggCords[j][k]);
             }
             glEnd();
         }
@@ -216,7 +220,7 @@ int main(int argc, char* argv[])
 
     glutInitWindowSize(300, 300);
 
-    glutCreateWindow("Układ współrzędnych 3-D");
+    glutCreateWindow("jajo");
 
     glutDisplayFunc(RenderScene);
 // Określenie, że funkcja RenderScene będzie funkcją zwrotną
