@@ -8,12 +8,13 @@
 #include <iostream>
 #include <cmath>
 
-#define numberOfPoints 100
+#define numberOfPoints 20
 
 typedef float point3[3];
 /*************************************************************************************/
 
 point3 eggCords[numberOfPoints][numberOfPoints];
+int model = 2;  // 1- punkty, 2- siatka, 3 - wypełnione trójkąty
 
 using namespace std;
 
@@ -25,10 +26,8 @@ void countEggCords() {
 
     float v, u, x, y, z;
 
-    float vSpace = (vmax-vmin)/(numberOfPoints-1); //TODO: nazwac to jakos
-    float uSpace = (umax-umin)/(numberOfPoints-1); //TODO: nazwac to jakos
-
-    int halfOfNumberOfPoint = numberOfPoints/2;
+    float vSpace = (vmax-vmin)/numberOfPoints; //TODO: nazwac to jakos
+    float uSpace = (umax-umin)/numberOfPoints; //TODO: nazwac to jakos
 
     for (int i = 0; i < numberOfPoints; i++) {
         for (int j = 0; j < numberOfPoints; j++) {
@@ -58,13 +57,42 @@ void countEggCords() {
 }
 
 void egg() {
-    glBegin(GL_POINTS);
-    for (int i = 0; i < numberOfPoints; i++) {
-        for (int j = 0; j < numberOfPoints; j++) {
-            glVertex3fv(eggCords[i][j]);
+    if (model == 1) {
+        glBegin(GL_POINTS);
+        for (int i = 0; i < numberOfPoints; i++) {
+            for (int j = 0; j < numberOfPoints; j++) {
+                glVertex3fv(eggCords[i][j]);
+            }
         }
+        glEnd();
+    } else if (model == 2) {
+        for (int i = 0; i < numberOfPoints; i++) {
+            glBegin(GL_LINES);
+            for (int j = 0; j < numberOfPoints; j++) {
+                glVertex3fv(eggCords[j][i]);
+            }
+            glEnd();
+        }
+        for (int i = 0; i < numberOfPoints; i++) {
+            glBegin(GL_LINES);
+            for (int j = 0; j < numberOfPoints; j++) {
+                glVertex3fv(eggCords[i][j]);
+            }
+            glEnd();
+        }
+        for (int i = 0; i < numberOfPoints; i++) {
+            glBegin(GL_LINES);
+            for (int j = 0; j < numberOfPoints; j++) {
+                glVertex3fv(eggCords[i][j]);
+            }
+            glEnd();
+        }
+    } else if (model == 3) {
+
+    } else {
+        model = 1;
+        egg();
     }
-    glEnd();
 }
 
 // Funkcja rysująca osie układu współrzędnych
@@ -120,6 +148,15 @@ void RenderScene(void)
 
     glutSwapBuffers();
 //
+}
+
+void keys(unsigned char key, int x, int y)
+{
+    if(key == 'p') model = 1;
+    if(key == 'w') model = 2;
+    if(key == 's') model = 3;
+
+    RenderScene(); // przerysowanie obrazu sceny
 }
 
 /*************************************************************************************/
@@ -188,6 +225,9 @@ int main(int argc, char* argv[])
     glutReshapeFunc(ChangeSize);
 // Dla aktualnego okna ustala funkcję zwrotną odpowiedzialną
 // zazmiany rozmiaru okna
+
+    glutKeyboardFunc(keys);
+
     MyInit();
 // Funkcja MyInit() (zdefiniowana powyżej) wykonuje wszelkie
 // inicjalizacje konieczne  przed przystąpieniem do renderowania
