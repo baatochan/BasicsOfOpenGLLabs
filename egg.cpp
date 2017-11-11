@@ -9,7 +9,7 @@
 #include <cmath>
 #include <time.h> //dla time
 
-#define numberOfPoints 20
+#define numberOfPoints 19
 
 typedef float point3[3];
 /*************************************************************************************/
@@ -18,7 +18,7 @@ static GLfloat theta[] = {-40, 85, 0}; // trzy kąty obrotu
 
 point3 eggCords[numberOfPoints][numberOfPoints];
 point3 eggCordsColors[numberOfPoints][numberOfPoints];
-int model = 1;  // 1- punkty, 2- siatka, 3 - wypełnione trójkąty
+int model = 2;  // 1- punkty, 2- siatka, 3 - wypełnione trójkąty
 
 using namespace std;
 
@@ -92,24 +92,32 @@ void drawEgg() {
         glEnd();
     } else if (model == 2) {
         int k = 0;
-        for (int i = 0; i < numberOfPoints; i++) {
+        /*for (int i = 0; i < numberOfPoints; i++) {
             glBegin(GL_LINES);
             glColor3f(1, 0, 0);
             for (int j = 0; j < numberOfPoints; j++) {
-                glVertex3fv(eggCords[j][i]);
+				glVertex3fv(eggCords[j][i]);
             }
             glEnd();
-        }
+        }*/
         for (int i = 0; i < numberOfPoints; i++) {
-            if (i == numberOfPoints || (i == numberOfPoints/2 && numberOfPoints%2 == 0)) continue;
+            if (i == 0 || (i == numberOfPoints/2 && numberOfPoints%2 == 0)) continue;
             glBegin(GL_LINES);
-            glColor3f(0, 1, 0);
+            glColor3f(0, 0.5, 0.5);
             for (int j = 0; j < numberOfPoints; j++) {
-                glVertex3fv(eggCords[i][j]);
+				if	(j != 0) {
+					glVertex3fv(eggCords[i][j]);
+				}
+				if (i == 0 && j == numberOfPoints - 1) continue;
+				if (i == numberOfPoints / 2 && numberOfPoints % 2 == 0 && j == numberOfPoints - 1) continue;
+				glVertex3fv(eggCords[i][j]);
+				if (j == numberOfPoints - 1) {
+					glVertex3fv(eggCords[numberOfPoints-i][0]);
+				}
             }
             glEnd();
         }
-        for (int i = 0; i < numberOfPoints; i++) {
+        /*for (int i = 0; i < numberOfPoints; i++) {
             glBegin(GL_LINES);
             glColor3f(0, 0, 1);
             for (int j = 0; j < numberOfPoints; j++) {
@@ -119,7 +127,7 @@ void drawEgg() {
                 glVertex3fv(eggCords[j][k]);
             }
             glEnd();
-        }
+        }*/
     } else if (model == 3) {
         int k = 0;
         int l = 0;
