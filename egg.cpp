@@ -8,12 +8,13 @@
 #include <cmath>
 #include <ctime> //dla time
 
-#define numberOfPoints 19 // poziom szczegolowosci rysunku - im wiecej tym wiecej punktow w jajku
+#define numberOfPoints 10 // poziom szczegolowosci rysunku - im wiecej tym wiecej punktow w jajku
 
 typedef float point3[3];
 /*************************************************************************************/
 
-static GLfloat theta[] = {-40, 85, 0}; // trzy kąty obrotu
+static GLfloat theta[] = {40, 85, 0}; // trzy kąty obrotu
+//static GLfloat theta[] = {0, 0, 0}; // trzy kąty obrotu
 
 point3 eggCords[numberOfPoints][numberOfPoints]; // tablica zawierajaca wspolrzedne punktow jajka
 point3 eggCordsColors[numberOfPoints][numberOfPoints]; // tablica zawierajaca kolory dla kazdego punkta jajka
@@ -100,57 +101,75 @@ void drawEgg() {
 			/*if (i == 11) {glColor3f(0,1,0);}
 			else {glColor3f(1,0,0);}*/
 			for (int j = 0; j < numberOfPoints; j++) {
+				if (i == 0 && j == 0) {glColor3f(0,1,0);}
+				else {glColor3f(1,0,0);}
 				glVertex3fv(eggCords[i][j]); // wypisuje kazdy punkt jeden raz do GL_POINTS
 			}
 		}
 		glEnd();
 	} else if (model == 2) { // przypadek drugi - rysuj siatke linii
-		for (int i = 0; i < numberOfPoints; i++) { //rysowanie lini poziomych
-			if (i == 0 || (i == numberOfPoints/2 && numberOfPoints%2 == 0)) continue; //nie rysuj linni dla punktow znajdujacych sie w pierszej kolumnie i srodkowej kolumnie - sa to gorne i dolne wierzcholki jajka ktore maja jedna i ta sama wartosc
-			glBegin(GL_LINES);
-			glColor3f(0, 0.5, 0.5);
-			for (int j = 0; j < numberOfPoints; j++) {
-				/**
-				 * Rysowanie polega na podaniu kolejnych punktow do linii, jednak nie wystarczy ich po prostu wypisac.
-				 * GL_LINES wymaga wypisywanie linii odcinkami, wiec 1szy pkt danej linii musi byc podany raz, kazdy kolejny dwa razy.
-				 * Normlanie ostatni punkt powinien byc podany jeden raz, jednak aby zakonczyc pierscien nalezy go polaczyc z pkt z innej kolumny (dla i, jest to kolumna numberOfPoints-i)
-				 * Stad tez pierwszy podawany pkt jest podawany raz dla j == 0, dla kazdego kolejnego dwa razy, gdy j == numberOfPoints - 1 (maksymalna wartosc) dopisany zostaje pierwsyz punkt z odpowiadajacej kolumny
-				 */
-				if	(j != 0) {
+		bool whatToDraw[3] = {
+				true,
+				true,
+				true
+		}; // pionowe, poziome, wierzcholki
+
+		if (whatToDraw[0]) {
+			for (int i = 0; i < numberOfPoints; i++) { //rysowanie lini poziomych
+				if (i == 0 || (i == numberOfPoints / 2 && numberOfPoints % 2 == 0))
+					continue; //nie rysuj linni dla punktow znajdujacych sie w pierszej kolumnie i srodkowej kolumnie - sa to gorne i dolne wierzcholki jajka ktore maja jedna i ta sama wartosc
+				glBegin(GL_LINES);
+				glColor3f(0, 0.5, 0.5);
+				for (int j = 0; j < numberOfPoints; j++) {
+					/**
+					 * Rysowanie polega na podaniu kolejnych punktow do linii, jednak nie wystarczy ich po prostu wypisac.
+					 * GL_LINES wymaga wypisywanie linii odcinkami, wiec 1szy pkt danej linii musi byc podany raz, kazdy kolejny dwa razy.
+					 * Normlanie ostatni punkt powinien byc podany jeden raz, jednak aby zakonczyc pierscien nalezy go polaczyc z pkt z innej kolumny (dla i, jest to kolumna numberOfPoints-i)
+					 * Stad tez pierwszy podawany pkt jest podawany raz dla j == 0, dla kazdego kolejnego dwa razy, gdy j == numberOfPoints - 1 (maksymalna wartosc) dopisany zostaje pierwsyz punkt z odpowiadajacej kolumny
+					 */
+					if (j != 0) {
+						glVertex3fv(eggCords[i][j]);
+					}
+					//if (i == 0 && j == numberOfPoints - 1) continue;
+					//if (i == numberOfPoints / 2 && numberOfPoints % 2 == 0 && j == numberOfPoints - 1) continue;
 					glVertex3fv(eggCords[i][j]);
+					if (j == numberOfPoints - 1) {
+						glVertex3fv(eggCords[numberOfPoints - i][0]);
+					}
 				}
-				//if (i == 0 && j == numberOfPoints - 1) continue;
-				//if (i == numberOfPoints / 2 && numberOfPoints % 2 == 0 && j == numberOfPoints - 1) continue;
-				glVertex3fv(eggCords[i][j]);
-				if (j == numberOfPoints - 1) {
-					glVertex3fv(eggCords[numberOfPoints-i][0]);
+				glEnd();
+			}
+		}
+		if (whatToDraw[1]) {
+			for (int i = 0; i < numberOfPoints; i++) { // rysowanie linii pionowych
+				glBegin(GL_LINES);
+				glColor3f(0.5, 0.5, 0);
+				for (int j = 0; j < numberOfPoints; j++) {
+					// schemat rysowania taki sam jak powyzej
+					if (j != 0) {
+						glVertex3fv(eggCords[j][i]);
+					}
+					glVertex3fv(eggCords[j][i]);
+					if (j == numberOfPoints - 1) {
+						glVertex3fv(eggCords[0][0]);
+					}
 				}
+				glEnd();
+			}
+		}
+		if (whatToDraw[2]) { //rysowanie wierzcholkow
+			glBegin(GL_POINTS);
+			glColor3f(0, 0.5, 0.5);
+			glVertex3fv(eggCords[0][0]); //wierzcholek dolny
+			if (numberOfPoints % 2 == 0) {
+				glVertex3fv(eggCords[numberOfPoints/2][0]); //wierzcholek gorny (o ile istnieje)
 			}
 			glEnd();
 		}
-		/*for (int i = 0; i < numberOfPoints; i++) {
-			glBegin(GL_LINES);
-			glColor3f(1, 0, 0);
-			for (int j = 0; j < numberOfPoints; j++) {
-				glVertex3fv(eggCords[j][i]);
-			}
-			glEnd();
-		}*/
-		/*for (int i = 0; i < numberOfPoints; i++) {
-			glBegin(GL_LINES);
-			glColor3f(0, 0, 1);
-			for (int j = 0; j < numberOfPoints; j++) {
-				k = i-j;
-				if (k < 0)
-					k += numberOfPoints;
-				glVertex3fv(eggCords[j][k]);
-			}
-			glEnd();
-		}*/
 	} else if (model == 3) { // przypadek trzeci - rysuj bryle jajka
 		int k = 0;
 		int l = 0;
-		for (int i = 0; i < numberOfPoints; i++) {
+		for (int i = 0; i < 1; i++) {
 			for (int j = 0; j < numberOfPoints; j++) {
 				k = j+1;
 				if (k >= numberOfPoints) k = 0;
@@ -249,14 +268,13 @@ void RenderScene(void)
 // funkcja definiujaca obracanie bryly
 void spinEgg()
 {
-
-   // theta[0] -= 0.01;
+	//theta[0] -= 0.005;
 	if( theta[0] > 360.0 ) theta[0] -= 360.0;
 
-	theta[1] -= 0.01;
+	//theta[1] -= 0.005;
 	if( theta[1] > 360.0 ) theta[1] -= 360.0;
 
-	//theta[2] -= 0.01;
+	//theta[2] -= 0.005;
 	if( theta[2] > 360.0 ) theta[2] -= 360.0;
 
 	glutPostRedisplay(); //odświeżenie zawartości aktualnego okna
