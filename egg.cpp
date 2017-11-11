@@ -8,18 +8,17 @@
 #include <cmath>
 #include <ctime> //dla time
 
-#define numberOfPoints 10 // poziom szczegolowosci rysunku - im wiecej tym wiecej punktow w jajku
+#define numberOfPoints 20 // poziom szczegolowosci rysunku - im wiecej tym wiecej punktow w jajku
 
 typedef float point3[3];
 /*************************************************************************************/
 
-static GLfloat theta[] = {40, 85, 0}; // trzy kąty obrotu
-//static GLfloat theta[] = {0, 0, 0}; // trzy kąty obrotu
+static GLfloat theta[] = {-40, 85, 0}; // trzy kąty obrotu
 
 point3 eggCords[numberOfPoints][numberOfPoints]; // tablica zawierajaca wspolrzedne punktow jajka
 point3 eggCordsColors[numberOfPoints][numberOfPoints]; // tablica zawierajaca kolory dla kazdego punkta jajka
 
-int model = 2;  // 1- punkty, 2- siatka, 3 - wypełnione trójkąty
+int model = 3;  // 1- punkty, 2- siatka, 3 - wypełnione trójkąty
 
 using namespace std;
 
@@ -96,13 +95,14 @@ void loadRandomColors() {
 void drawEgg() {
 	if (model == 1) { // przypadek pierwszy - rysuj punkty
 		glBegin(GL_POINTS);
+		glColor3f(1,0,0);
 		for (int i = 0; i < numberOfPoints; i++) {
 			//glColor3f(getRandomColor(), getRandomColor(), getRandomColor());
-			/*if (i == 11) {glColor3f(0,1,0);}
+			/*if (i == 8) {glColor3f(0,1,0);}
 			else {glColor3f(1,0,0);}*/
 			for (int j = 0; j < numberOfPoints; j++) {
-				if (i == 0 && j == 0) {glColor3f(0,1,0);}
-				else {glColor3f(1,0,0);}
+				/*if (i == 0 && j == 0) {glColor3f(0,1,0);}
+				else {glColor3f(1,0,0);}*/
 				glVertex3fv(eggCords[i][j]); // wypisuje kazdy punkt jeden raz do GL_POINTS
 			}
 		}
@@ -119,7 +119,8 @@ void drawEgg() {
 				if (i == 0 || (i == numberOfPoints / 2 && numberOfPoints % 2 == 0))
 					continue; //nie rysuj linni dla punktow znajdujacych sie w pierszej kolumnie i srodkowej kolumnie - sa to gorne i dolne wierzcholki jajka ktore maja jedna i ta sama wartosc
 				glBegin(GL_LINES);
-				glColor3f(0, 0.5, 0.5);
+				glColor3f(0, 1, 0);
+				//glColor3f(0, 0.5, 0.5);
 				for (int j = 0; j < numberOfPoints; j++) {
 					/**
 					 * Rysowanie polega na podaniu kolejnych punktow do linii, jednak nie wystarczy ich po prostu wypisac.
@@ -143,7 +144,8 @@ void drawEgg() {
 		if (whatToDraw[1]) {
 			for (int i = 0; i < numberOfPoints; i++) { // rysowanie linii pionowych
 				glBegin(GL_LINES);
-				glColor3f(0.5, 0.5, 0);
+				//glColor3f(0.5, 0.5, 0);
+				glColor3f(0, 1, 0);
 				for (int j = 0; j < numberOfPoints; j++) {
 					// schemat rysowania taki sam jak powyzej
 					if (j != 0) {
@@ -159,7 +161,8 @@ void drawEgg() {
 		}
 		if (whatToDraw[2]) { //rysowanie wierzcholkow
 			glBegin(GL_POINTS);
-			glColor3f(0, 0.5, 0.5);
+			//glColor3f(0, 0.5, 0.5);
+			glColor3f(0, 1, 0);
 			glVertex3fv(eggCords[0][0]); //wierzcholek dolny
 			if (numberOfPoints % 2 == 0) {
 				glVertex3fv(eggCords[numberOfPoints/2][0]); //wierzcholek gorny (o ile istnieje)
@@ -169,33 +172,153 @@ void drawEgg() {
 	} else if (model == 3) { // przypadek trzeci - rysuj bryle jajka
 		int k = 0;
 		int l = 0;
-		for (int i = 0; i < 1; i++) {
-			for (int j = 0; j < numberOfPoints; j++) {
-				k = j+1;
-				if (k >= numberOfPoints) k = 0;
-				l = i+1;
-				if (l >= numberOfPoints) l = 0;
+		int m = 0;
+		int n = 0;
+		int o = 0;
+		for (int i = 0; i < numberOfPoints; i++) {
+			if (i == 0) {
+				for (int j = 0; j < numberOfPoints; j++) {
+					k = 1;
+					glBegin(GL_TRIANGLES);
+					glColor3fv(eggCordsColors[0][0]);
+					glVertex3fv(eggCords[0][0]);
 
-				glBegin(GL_TRIANGLES);
+					glColor3fv(eggCordsColors[k][j]);
+					glVertex3fv(eggCords[k][j]);
+
+					if (j + 1 == numberOfPoints) {
+						glColor3fv(eggCordsColors[numberOfPoints-1][0]);
+						glVertex3fv(eggCords[numberOfPoints-1][0]);
+					}
+					else {
+						glColor3fv(eggCordsColors[k][j + 1]);
+						glVertex3fv(eggCords[k][j + 1]);
+					}
+					glEnd();
+				}
+			} else if (i == numberOfPoints - 1) {
+				for (int j = 0; j < numberOfPoints; j++) {
+					k = 1;
+					glBegin(GL_TRIANGLES);
+					glColor3fv(eggCordsColors[0][0]);
+					glVertex3fv(eggCords[0][0]);
+
 					glColor3fv(eggCordsColors[i][j]);
 					glVertex3fv(eggCords[i][j]);
 
-					glColor3fv(eggCordsColors[i][k]);
-					glVertex3fv(eggCords[i][k]);
+					if (j + 1 == numberOfPoints) {
+						glColor3fv(eggCordsColors[1][0]);
+						glVertex3fv(eggCords[1][0]);
+					}
+					else {
+						glColor3fv(eggCordsColors[i][j + 1]);
+						glVertex3fv(eggCords[i][j + 1]);
+					}
+					glEnd();
+				}
+			} else if (i == (numberOfPoints / 2) - 1 && numberOfPoints % 2 == 0) {
+				for (int j = 0; j < numberOfPoints; j++) {
+					k = numberOfPoints / 2;
+					glBegin(GL_TRIANGLES);
+					glColor3fv(eggCordsColors[k][0]);
+					glVertex3fv(eggCords[k][0]);
 
-					glColor3fv(eggCordsColors[l][j]);
-					glVertex3fv(eggCords[l][j]);
-				glEnd();
-				glBegin(GL_TRIANGLES);
-					glColor3fv(eggCordsColors[i][k]);
-					glVertex3fv(eggCords[i][k]);
+					glColor3fv(eggCordsColors[i][j]);
+					glVertex3fv(eggCords[i][j]);
 
-					glColor3fv(eggCordsColors[l][j]);
-					glVertex3fv(eggCords[l][j]);
+					if (j + 1 == numberOfPoints) {
+						glColor3fv(eggCordsColors[k+1][0]);
+						glVertex3fv(eggCords[k+1][0]);
+					}
+					else {
+						glColor3fv(eggCordsColors[i][j + 1]);
+						glVertex3fv(eggCords[i][j + 1]);
+					}
+					glEnd();
+				}
+			} else if (i == numberOfPoints / 2 && numberOfPoints % 2 == 0) {
+				for (int j = 0; j < numberOfPoints; j++) {
+					k = numberOfPoints / 2 + 1;
+					glBegin(GL_TRIANGLES);
+					glColor3fv(eggCordsColors[i][0]);
+					glVertex3fv(eggCords[i][0]);
 
-					glColor3fv(eggCordsColors[l][k]);
-					glVertex3fv(eggCords[l][k]);
-				glEnd();
+					glColor3fv(eggCordsColors[k][j]);
+					glVertex3fv(eggCords[k][j]);
+
+					if (j + 1 == numberOfPoints) {
+						glColor3fv(eggCordsColors[k-2][0]);
+						glVertex3fv(eggCords[k-2][0]);
+					}
+					else {
+						glColor3fv(eggCordsColors[k][j + 1]);
+						glVertex3fv(eggCords[k][j + 1]);
+					}
+					glEnd();
+				}
+			} else if (numberOfPoints % 2 == 1 && i == (numberOfPoints - 1) / 2) {
+				for (int j = 0; j < numberOfPoints - 1; j++) {
+					k = i + 1;
+					glBegin(GL_TRIANGLES);
+					glColor3fv(eggCordsColors[i][j]);
+					glVertex3fv(eggCords[i][j]);
+
+					glColor3fv(eggCordsColors[k][numberOfPoints - 1 - j]);
+					glVertex3fv(eggCords[k][numberOfPoints - 1 - j]);
+
+					glColor3fv(eggCordsColors[i][j + 1]);
+					glVertex3fv(eggCords[i][j + 1]);
+					glEnd();
+				}
+			} else if (numberOfPoints % 2 == 1 && i == (numberOfPoints + 1) / 2) {
+				for (int j = 0; j < numberOfPoints - 1; j++) {
+					k = i - 1;
+					glBegin(GL_TRIANGLES);
+					glColor3fv(eggCordsColors[i][j]);
+					glVertex3fv(eggCords[i][j]);
+
+					glColor3fv(eggCordsColors[k][numberOfPoints - 1 - j]);
+					glVertex3fv(eggCords[k][numberOfPoints - 1 - j]);
+
+					glColor3fv(eggCordsColors[i][j + 1]);
+					glVertex3fv(eggCords[i][j + 1]);
+					glEnd();
+				}
+			} else {
+				for (int j = 0; j < numberOfPoints; j++) {
+					k = i + 1;
+					l = j + 1;
+					m = i + 1;
+					n = j + 1;
+					o = i;
+					if (l == numberOfPoints) {
+						n = 0;
+						o = numberOfPoints - i;
+						m = numberOfPoints - i - 1;
+					}
+
+					glBegin(GL_TRIANGLES);
+					glColor3fv(eggCordsColors[i][j]);
+					glVertex3fv(eggCords[i][j]);
+
+					glColor3fv(eggCordsColors[k][j]);
+					glVertex3fv(eggCords[k][j]);
+
+					glColor3fv(eggCordsColors[o][n]);
+					glVertex3fv(eggCords[o][n]);
+					glEnd();
+
+					glBegin(GL_TRIANGLES);
+					glColor3fv(eggCordsColors[m][n]);
+					glVertex3fv(eggCords[m][n]);
+
+					glColor3fv(eggCordsColors[k][j]);
+					glVertex3fv(eggCords[k][j]);
+
+					glColor3fv(eggCordsColors[o][n]);
+					glVertex3fv(eggCords[o][n]);
+					glEnd();
+				}
 			}
 		}
 	} else {
@@ -268,13 +391,13 @@ void RenderScene(void)
 // funkcja definiujaca obracanie bryly
 void spinEgg()
 {
-	//theta[0] -= 0.005;
+	theta[0] -= 0.05;
 	if( theta[0] > 360.0 ) theta[0] -= 360.0;
 
-	//theta[1] -= 0.005;
+	theta[1] -= 0.05;
 	if( theta[1] > 360.0 ) theta[1] -= 360.0;
 
-	//theta[2] -= 0.005;
+	theta[2] -= 0.05;
 	if( theta[2] > 360.0 ) theta[2] -= 360.0;
 
 	glutPostRedisplay(); //odświeżenie zawartości aktualnego okna
