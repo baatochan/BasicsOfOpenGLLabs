@@ -17,12 +17,15 @@ static GLint status = 0;       // stan klawiszy myszy
 // 0 - nie naciśnięto żadnego klawisza
 // 1 - naciśnięty zostać lewy klawisz
 
-static int x_pos_old=0;       // poprzednia pozycja kursora myszy os x
-static int delta_x = 0;        // różnica pomiędzy pozycją bieżącą os x
+static int x_pos_old=0;       // poprzednia pozycja kursora myszy (os x)
+static int delta_x = 0;        // różnica pomiędzy pozycją bieżącą (os x) i poprzednią kursora myszy
 
-static int y_pos_old=0;       // poprzednia pozycja kursora myszy os y
-static int delta_y = 0;        // różnica pomiędzy pozycją bieżącą os y
-// i poprzednią kursora myszy
+static int y_pos_old=0;       // poprzednia pozycja kursora myszy (os y)
+static int delta_y = 0;        // różnica pomiędzy pozycją bieżącą (os y) i poprzednią kursora myszy
+
+static int zoom_pos_old=0;       // poprzednia pozycja kursora myszy (zoom)
+static int delta_zoom = 0;        // różnica pomiędzy pozycją bieżącą (zoom) i poprzednią kursora myszy
+//
 /*************************************************************************************/
 // Funkcja rysująca osie układu wspó?rz?dnych
 
@@ -68,6 +71,12 @@ void RenderScene(void)
 
     glLoadIdentity();
 // Czyszczenie macierzy bie??cej
+
+    if (status == 2) {
+        viewer[2] = viewer[2] - 2*delta_zoom;
+        if (viewer[2] < 8) viewer[2] = 8;
+        if (viewer[2] > 900) viewer[2] = 900;
+    }
 
     gluLookAt(viewer[0],viewer[1],viewer[2], 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 // Zdefiniowanie położenia obserwatora
@@ -118,7 +127,7 @@ void ChangeSize(GLsizei horizontal, GLsizei vertical)
     glLoadIdentity();
     // Czyszcznie macierzy bieżącej
 
-    gluPerspective(70, 1.0, 1.0, 30.0);
+    gluPerspective(70, 1.0, 1.0, 1000.0);
     // Ustawienie parametrów dla rzutu perspektywicznego
 
 
@@ -150,6 +159,9 @@ void Mouse(int btn, int state, int x, int y)
         y_pos_old=y;         // przypisanie aktualnie odczytanej pozycji kursora
         // jako pozycji poprzedniej
         status = 1;          // wcięnięty został lewy klawisz myszy
+    } else if (btn==GLUT_RIGHT_BUTTON && state == GLUT_DOWN) {
+        zoom_pos_old=x;
+        status = 2;
     }
     else
 
@@ -170,6 +182,10 @@ void Motion( GLsizei x, GLsizei y )
     delta_y=y-y_pos_old;     // obliczenie różnicy położenia kursora myszy
 
     y_pos_old=y;            // podstawienie bieżącego położenia jako poprzednie
+
+    delta_zoom=x-zoom_pos_old;     // obliczenie różnicy położenia kursora myszy
+
+    zoom_pos_old=x;            // podstawienie bieżącego położenia jako poprzednie
 
     glutPostRedisplay();     // przerysowanie obrazu sceny
 }
