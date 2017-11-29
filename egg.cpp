@@ -13,12 +13,12 @@
 typedef float point3[3];
 /*************************************************************************************/
 
-static GLfloat theta[] = {-40, 85, 0}; // trzy kąty obrotu
+static GLfloat theta[] = {0, 0, 0}; // trzy kąty obrotu
 
 point3 eggCords[numberOfPoints][numberOfPoints]; // tablica zawierajaca wspolrzedne punktow jajka
 point3 eggCordsColors[numberOfPoints][numberOfPoints]; // tablica zawierajaca kolory dla kazdego punkta jajka
 
-int model = 3;  // 1- punkty, 2- siatka, 3 - wypełnione trójkąty
+int model = 3;  // 1- punkty, 2- siatka, 3 - wypełnione trójkąty, 4 - poprawna siatka
 
 using namespace std;
 
@@ -321,6 +321,170 @@ void drawEgg() {
 				}
 			}
 		}
+	} else if (model == 4) { // przypadek czwarty - rysuj poprawna siatke
+		int k = 0;
+		int l = 0;
+		int m = 0;
+		int n = 0;
+		int o = 0;
+		for (int i = 0; i < numberOfPoints; i++) {
+			if (i == 0) {
+				for (int j = 0; j < numberOfPoints; j++) {
+					k = 1;
+					glBegin(GL_LINES);
+					glColor3f(1.0,0,1.0);
+
+					glVertex3fv(eggCords[0][0]);
+
+					glVertex3fv(eggCords[k][j]);
+
+					if (j + 1 == numberOfPoints) {
+						glVertex3fv(eggCords[k][j]);
+						glVertex3fv(eggCords[numberOfPoints - 1][0]);
+						glVertex3fv(eggCords[numberOfPoints - 1][0]);
+						glVertex3fv(eggCords[0][0]);
+					} else {
+						glVertex3fv(eggCords[k][j]);
+						glVertex3fv(eggCords[k][j + 1]);
+						glVertex3fv(eggCords[k][j + 1]);
+						glVertex3fv(eggCords[0][0]);
+					}
+					glEnd();
+				}
+			} else if (i == numberOfPoints - 1) {
+				for (int j = 0; j < numberOfPoints; j++) {
+					k = 1;
+					glBegin(GL_LINES);
+					glVertex3fv(eggCords[0][0]);
+
+					glVertex3fv(eggCords[i][j]);
+
+					if (j + 1 == numberOfPoints) {
+						glVertex3fv(eggCords[i][j]);
+						glVertex3fv(eggCords[1][0]);
+						glVertex3fv(eggCords[1][0]);
+						glVertex3fv(eggCords[0][0]);
+					} else {
+						glVertex3fv(eggCords[i][j]);
+						glVertex3fv(eggCords[i][j + 1]);
+						glVertex3fv(eggCords[i][j + 1]);
+						glVertex3fv(eggCords[0][0]);
+					}
+					glEnd();
+				}
+			} else if (i == (numberOfPoints / 2) - 1 && numberOfPoints % 2 == 0) {
+				for (int j = 0; j < numberOfPoints; j++) {
+					k = numberOfPoints / 2;
+					glBegin(GL_LINES);
+					glVertex3fv(eggCords[k][0]);
+
+					glVertex3fv(eggCords[i][j]);
+
+					if (j + 1 == numberOfPoints) {
+						glVertex3fv(eggCords[i][j]);
+						glVertex3fv(eggCords[k + 1][0]);
+						glVertex3fv(eggCords[k + 1][0]);
+						glVertex3fv(eggCords[k][0]);
+					} else {
+						glVertex3fv(eggCords[i][j]);
+						glVertex3fv(eggCords[i][j + 1]);
+						glVertex3fv(eggCords[i][j + 1]);
+						glVertex3fv(eggCords[k][0]);
+					}
+					glEnd();
+				}
+			} else if (i == numberOfPoints / 2 && numberOfPoints % 2 == 0) {
+				for (int j = 0; j < numberOfPoints; j++) {
+					k = numberOfPoints / 2 + 1;
+					glBegin(GL_LINES);
+					glVertex3fv(eggCords[i][0]);
+
+					glVertex3fv(eggCords[k][j]);
+
+					if (j + 1 == numberOfPoints) {
+						glVertex3fv(eggCords[k][j]);
+						glVertex3fv(eggCords[k - 2][0]);
+						glVertex3fv(eggCords[k - 2][0]);
+						glVertex3fv(eggCords[i][0]);
+
+					} else {
+						glVertex3fv(eggCords[k][j]);
+						glVertex3fv(eggCords[k][j + 1]);
+						glVertex3fv(eggCords[k][j + 1]);
+						glVertex3fv(eggCords[i][0]);
+
+					}
+					glEnd();
+				}
+			} else if (numberOfPoints % 2 == 1 && i == (numberOfPoints - 1) / 2) {
+				for (int j = 0; j < numberOfPoints - 1; j++) {
+					k = i + 1;
+					glBegin(GL_LINES);
+					glVertex3fv(eggCords[i][j]);
+
+					glVertex3fv(eggCords[k][numberOfPoints - 1 - j]);
+					glVertex3fv(eggCords[k][numberOfPoints - 1 - j]);
+
+					glVertex3fv(eggCords[i][j + 1]);
+					glVertex3fv(eggCords[i][j + 1]);
+					glVertex3fv(eggCords[i][j]);
+
+					glEnd();
+				}
+			} else if (numberOfPoints % 2 == 1 && i == (numberOfPoints + 1) / 2) {
+				for (int j = 0; j < numberOfPoints - 1; j++) {
+					k = i - 1;
+					glBegin(GL_LINES);
+					glVertex3fv(eggCords[i][j]);
+
+					glVertex3fv(eggCords[k][numberOfPoints - 1 - j]);
+					glVertex3fv(eggCords[k][numberOfPoints - 1 - j]);
+
+					glVertex3fv(eggCords[i][j + 1]);
+					glVertex3fv(eggCords[i][j + 1]);
+					glVertex3fv(eggCords[i][j]);
+
+					glEnd();
+				}
+			} else {
+				for (int j = 0; j < numberOfPoints; j++) {
+					k = i + 1;
+					l = j + 1;
+					m = i + 1;
+					n = j + 1;
+					o = i;
+					if (l == numberOfPoints) {
+						n = 0;
+						o = numberOfPoints - i;
+						m = numberOfPoints - i - 1;
+					}
+
+					glBegin(GL_LINES);
+					glVertex3fv(eggCords[i][j]);
+
+					glVertex3fv(eggCords[k][j]);
+					glVertex3fv(eggCords[k][j]);
+
+					glVertex3fv(eggCords[o][n]);
+					glVertex3fv(eggCords[o][n]);
+					glVertex3fv(eggCords[i][j]);
+
+					glEnd();
+
+					glBegin(GL_LINES);
+					glVertex3fv(eggCords[m][n]);
+
+					glVertex3fv(eggCords[k][j]);
+					glVertex3fv(eggCords[k][j]);
+
+					glVertex3fv(eggCords[o][n]);
+					glVertex3fv(eggCords[o][n]);
+					glVertex3fv(eggCords[m][n]);
+
+					glEnd();
+				}
+			}
+		}
 	} else {
 		model = 1;
 		drawEgg();
@@ -406,9 +570,10 @@ void spinEgg()
 // funckja reakcji na klawiature - zmiana modelu rysowanego w zaleznosci od klawisza
 void keys(unsigned char key, int x, int y)
 {
-	if(key == 'p') model = 1;
-	if(key == 'w') model = 2;
-	if(key == 's') model = 3;
+	if(key == 'q') model = 1;
+	if(key == 't') model = 2;
+	if(key == 'e') model = 3;
+	if(key == 'w') model = 4;
 
 	RenderScene(); // przerysowanie obrazu sceny
 }
