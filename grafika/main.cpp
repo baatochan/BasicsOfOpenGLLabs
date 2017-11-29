@@ -9,16 +9,19 @@
 typedef float point3[3];
 static GLfloat viewer[]= {0.0, 0.0, 10.0};
 // inicjalizacja położenia obserwatora
-static GLfloat theta = 0.0;   // kąt obrotu obiektu
+static GLfloat thetaX = 0.0;   // kąt obrotu obiektu
+static GLfloat thetaY = 0.0;   // kąt obrotu obiektu
 static GLfloat pix2angle;     // przelicznik pikseli na stopnie
 
 static GLint status = 0;       // stan klawiszy myszy
 // 0 - nie naciśnięto żadnego klawisza
 // 1 - naciśnięty zostać lewy klawisz
 
-static int x_pos_old=0;       // poprzednia pozycja kursora myszy
+static int x_pos_old=0;       // poprzednia pozycja kursora myszy os x
+static int delta_x = 0;        // różnica pomiędzy pozycją bieżącą os x
 
-static int delta_x = 0;        // różnica pomiędzy pozycją bieżącą
+static int y_pos_old=0;       // poprzednia pozycja kursora myszy os y
+static int delta_y = 0;        // różnica pomiędzy pozycją bieżącą os y
 // i poprzednią kursora myszy
 /*************************************************************************************/
 // Funkcja rysująca osie układu wspó?rz?dnych
@@ -73,10 +76,12 @@ void RenderScene(void)
 
     if(status == 1)                     // jeśli lewy klawisz myszy wcięnięty
     {
-        theta += delta_x*pix2angle;    // modyfikacja kąta obrotu o kat proporcjonalny
+        thetaX += delta_x*pix2angle;    // modyfikacja kąta obrotu o kat proporcjonalny
+        thetaY += delta_y*pix2angle;    // modyfikacja kąta obrotu o kat proporcjonalny
     }                                  // do różnicy położeń kursora myszy
 
-    glRotatef(theta, 0.0, 1.0, 0.0);  //obrót obiektu o nowy kąt
+    glRotatef(thetaX, 0.0, 1.0, 0.0);  //obrót obiektu o nowy kąt
+    glRotatef(thetaY, 1.0, 0.0, 0.0);
 
     glColor3f(1.0f, 1.0f, 1.0f);
 // Ustawienie koloru rysowania na biały
@@ -142,6 +147,7 @@ void Mouse(int btn, int state, int x, int y)
     if(btn==GLUT_LEFT_BUTTON && state == GLUT_DOWN)
     {
         x_pos_old=x;         // przypisanie aktualnie odczytanej pozycji kursora
+        y_pos_old=y;         // przypisanie aktualnie odczytanej pozycji kursora
         // jako pozycji poprzedniej
         status = 1;          // wcięnięty został lewy klawisz myszy
     }
@@ -160,6 +166,10 @@ void Motion( GLsizei x, GLsizei y )
     delta_x=x-x_pos_old;     // obliczenie różnicy położenia kursora myszy
 
     x_pos_old=x;            // podstawienie bieżącego położenia jako poprzednie
+
+    delta_y=y-y_pos_old;     // obliczenie różnicy położenia kursora myszy
+
+    y_pos_old=y;            // podstawienie bieżącego położenia jako poprzednie
 
     glutPostRedisplay();     // przerysowanie obrazu sceny
 }
