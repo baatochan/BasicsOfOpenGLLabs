@@ -73,8 +73,8 @@ void RenderScene(void)
 // Czyszczenie macierzy bie??cej
 
 	if (status == 2) {
-		viewer[2] = viewer[2] - 2*delta_zoom;
-		if (viewer[2] < 8) viewer[2] = 8;
+		viewer[2] = viewer[2] + delta_zoom;
+		if (viewer[2] < 4) viewer[2] = 4;
 		if (viewer[2] > 900) viewer[2] = 900;
 	}
 
@@ -127,15 +127,17 @@ void ChangeSize(GLsizei horizontal, GLsizei vertical)
 	glLoadIdentity();
 	// Czyszcznie macierzy bieżącej
 
-	gluPerspective(70, 1.0, 1.0, 1000.0);
+	float aspect = (GLfloat)horizontal/vertical;
+
+	gluPerspective(70, aspect, 1.0, 1000.0);
 	// Ustawienie parametrów dla rzutu perspektywicznego
 
 
 	if(horizontal <= vertical)
-		glViewport(0, (vertical-horizontal)/2, horizontal, horizontal);
+		glViewport(0, (vertical-horizontal)/2, horizontal, vertical);
 
 	else
-		glViewport((horizontal-vertical)/2, 0, vertical, vertical);
+		glViewport(0, 0, horizontal, vertical);
 	// Ustawienie wielkości okna okna widoku (viewport) w zależności
 	// relacji pomiędzy wysokością i szerokością okna
 
