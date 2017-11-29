@@ -5,6 +5,7 @@
 #include <windows.h>
 #include <gl/gl.h>
 #include <gl/glut.h>
+#include <iostream>
 
 typedef float point3[3];
 static GLfloat viewer[]= {0.0, 0.0, 10.0};
@@ -73,9 +74,10 @@ void RenderScene(void)
 // Czyszczenie macierzy bie??cej
 
 	if (status == 2) {
-		viewer[2] = viewer[2] + delta_zoom;
+		viewer[2] = viewer[2] + delta_zoom*pix2angle;
 		if (viewer[2] < 4) viewer[2] = 4;
-		if (viewer[2] > 900) viewer[2] = 900;
+		if (viewer[2] > 90) viewer[2] = 90;
+		//std::cout<<"RENDERv2: "<<viewer[2]<<" deltazoom: "<<delta_zoom<<" dz*pa: "<<delta_zoom*pix2angle<<std::endl;
 	}
 
 	gluLookAt(viewer[0],viewer[1],viewer[2], 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
@@ -129,7 +131,7 @@ void ChangeSize(GLsizei horizontal, GLsizei vertical)
 
 	float aspect = (GLfloat)horizontal/vertical;
 
-	gluPerspective(70, aspect, 1.0, 1000.0);
+	gluPerspective(70, aspect, 1.0, 100.0);
 	// Ustawienie parametrów dla rzutu perspektywicznego
 
 
@@ -164,6 +166,7 @@ void Mouse(int btn, int state, int x, int y)
 	} else if (btn==GLUT_RIGHT_BUTTON && state == GLUT_DOWN) {
 		zoom_pos_old=x;
 		status = 2;
+		//std::cout<<"MOUSEzoomold: "<<zoom_pos_old<<" x:"<<x<<" ";
 	}
 	else
 
@@ -188,6 +191,8 @@ void Motion( GLsizei x, GLsizei y )
 	delta_zoom=x-zoom_pos_old;     // obliczenie różnicy położenia kursora myszy
 
 	zoom_pos_old=x;            // podstawienie bieżącego położenia jako poprzednie
+
+	//std::cout<<"MOTIONdeltazoom: "<<delta_zoom<<" x: "<<x<<" zoomold: "<<zoom_pos_old<<" ";
 
 	glutPostRedisplay();     // przerysowanie obrazu sceny
 }
