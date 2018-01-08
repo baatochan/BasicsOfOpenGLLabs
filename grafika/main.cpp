@@ -20,17 +20,28 @@ point3 eggCordsColors[numberOfPoints][numberOfPoints]; // tablica zawierajaca ko
 
 int model = 3;  // 1- punkty, 2- siatka, 3 - wypełnione trójkąty, 4 - poprawna siatka
 
+float speed = 0.2;		//Predkosc obrotow
+
+static GLfloat viewer[] = { 0.0, 0.0, 10.0 };
+// inicjalizacja polozenia obserwatora
+static GLfloat thetaLook = 0.0;   // kat obrotu obiektu x
+static GLfloat fi = 0.0;   // kat obrotu obiektu y
+static GLfloat pix2angle;     // przelicznik pikseli na stopnie
+static GLfloat pix2angley;     // przelicznik pikseli na stopnie y
+static GLfloat R = 10;
+
 static GLint status = 0;       // stan klawiszy myszy
-// 0 - nie naciœniêto ¿adnego klawisza
-// 1 - naciœniêty zostaæ lewy klawisz
+// 0 - nie nacisnieto zadnego klawisza
+// 1 - nacisniety zostal lewy klawisz
+// 2 - prawy klawisz
 
 static int x_pos_old = 0;       // poprzednia pozycja kursora myszy
 static int y_pos_old = 0;       // poprzednia pozycja kursora myszy
 
-static int delta_x = 0;        // ró¿nica pomiêdzy pozycj¹ bie¿¹c¹
-// i poprzedni¹ kursora myszy
-static int delta_y = 0;        // ró¿nica pomiêdzy pozycj¹ bie¿¹c¹
-// i poprzedni¹ kursora myszy
+static int delta_x = 0;        // róznica pomiedzy pozycja biezaca
+// i poprzednia kursora myszy
+static int delta_y = 0;        // róznica pomiedzy pozycja biezaca
+// i poprzednia kursora myszy
 
 using namespace std;
 
@@ -504,7 +515,7 @@ void drawEgg() {
 }
 
 /*************************************************************************************/
-// Funkcja "bada" stan myszy i ustawia wartoœci odpowiednich zmiennych globalnych
+// Funkcja "bada" stan myszy i ustawia wartosci odpowiednich zmiennych globalnych
 
 void Mouse(int btn, int state, int x, int y)
 {
@@ -516,7 +527,7 @@ void Mouse(int btn, int state, int x, int y)
 		// jako pozycji poprzedniej
 		y_pos_old = y;        // przypisanie aktualnie odczytanej pozycji kursora
 		// jako pozycji poprzedniej
-		status = 1;          // wciêniêty zosta³ lewy klawisz myszy
+		status = 1;          // wcieniety zostal lewy klawisz myszy
 	}
 	else
 
@@ -524,26 +535,26 @@ void Mouse(int btn, int state, int x, int y)
 	{
 		y_pos_old = y;        // przypisanie aktualnie odczytanej pozycji kursora
 		// jako pozycji poprzedniej
-		status = 2;          // wciêniêty zosta³ lewy klawisz myszy
+		status = 2;          // wcieniety zostal prawy klawisz myszy
 	}
 	else
-		status = 0;          // nie zosta³ wciêniêty ¿aden klawisz
+		status = 0;          // nie zostal wcieniety zaden klawisz
 }
 
 /*************************************************************************************/
-// Funkcja "monitoruje" po³o¿enie kursora myszy i ustawia wartoœci odpowiednich
+// Funkcja "monitoruje" polozenie kursora myszy i ustawia wartosci odpowiednich
 // zmiennych globalnych
 
 void Motion(GLsizei x, GLsizei y)
 {
 
-	delta_x = x - x_pos_old;     // obliczenie ró¿nicy po³o¿enia kursora myszy
+	delta_x = x - x_pos_old;     // obliczenie róznicy polozenia kursora myszy
 
-	x_pos_old = x;            // podstawienie bie¿¹cego po³o¿enia jako poprzednie
+	x_pos_old = x;            // podstawienie biezacego polozenia jako poprzednie
 
-	delta_y = y - y_pos_old;     // obliczenie ró¿nicy po³o¿enia kursora myszy
+	delta_y = y - y_pos_old;     // obliczenie róznicy polozenia kursora myszy
 
-	y_pos_old = y;            // podstawienie bie¿¹cego po³o¿enia jako poprzednie
+	y_pos_old = y;            // podstawienie biezacego polozenia jako poprzednie
 
 	glutPostRedisplay();     // przerysowanie obrazu sceny
 }
@@ -553,16 +564,16 @@ void Motion(GLsizei x, GLsizei y)
 // Funkcja rysująca osie układu współrzędnych
 void Axes(void)
 {
-	point3  x_min = {-5.0, 0.0, 0.0};
-	point3  x_max = { 5.0, 0.0, 0.0};
+	point3  x_min = {-10.0, 0.0, 0.0};
+	point3  x_max = { 10.0, 0.0, 0.0};
 // początek i koniec obrazu osi x
 
-	point3  y_min = {0.0, -5.0, 0.0};
-	point3  y_max = {0.0,  5.0, 0.0};
+	point3  y_min = {0.0, -10.0, 0.0};
+	point3  y_max = {0.0,  10.0, 0.0};
 // początek i koniec obrazu osi y
 
-	point3  z_min = {0.0, 0.0, -5.0};
-	point3  z_max = {0.0, 0.0,  5.0};
+	point3  z_min = {0.0, 0.0, -10.0};
+	point3  z_max = {0.0, 0.0,  10.0};
 //  początek i koniec obrazu osi y
 	glColor3f(1.0f, 0.0f, 0.0f);  // kolor rysowania osi - czerwony
 	glBegin(GL_LINES); // rysowanie osi x
@@ -593,8 +604,41 @@ void RenderScene(void)
 
 	glLoadIdentity();
 // Czyszczenie macierzy bieżącej
+	gluLookAt(viewer[0], viewer[1], viewer[2], 0.0, 0.0, 0.0, 0.0, cos(fi), 0.0);
+	// Zdefiniowanie polozenia obserwatora
 	Axes();
 // Narysowanie osi przy pomocy funkcji zdefiniowanej wyżej
+
+	if (status == 1)                     // jesli lewy klawisz myszy wcieniety
+	{
+
+		thetaLook += float(delta_x*pix2angle);    // modyfikacja kata obrotu o kat proporcjonalny
+		fi += float(delta_y*pix2angley);
+
+		(thetaLook > 2 * M_PI) ? thetaLook -= 2 * M_PI : thetaLook;
+		(thetaLook < 0) ? thetaLook += 2 * M_PI : thetaLook;
+
+
+		(fi > 2 * M_PI) ? fi -= 2 * M_PI : fi;
+		(fi < 0) ? fi += 2 * M_PI : fi;
+
+	}                                  // do róznicy polozeñ kursora myszy
+
+
+
+	if (status == 2)                     // jesli prawy klawisz myszy wcieniety
+	{
+		R += delta_y;
+	}
+
+
+
+
+	(R > 27) ? R = 27 : R;
+	(R < 7) ? R = 7 : R;
+	viewer[0] = R*cos(thetaLook)*cos(fi);
+	viewer[1] = R*sin(fi);
+	viewer[2] = R*sin(thetaLook)*cos(fi);
 
 	glRotatef(theta[0], 1.0, 0.0, 0.0);
 
@@ -653,29 +697,32 @@ void MyInit(void)
 
 void ChangeSize(GLsizei horizontal, GLsizei vertical )
 {
+	pix2angle = 2 * M_PI / (float)horizontal / 3;  // przeliczenie pikseli na stopnie
+	pix2angley = 2 * M_PI / (float)vertical / 3;  // przeliczenie pikseli na stopnie
+
 	GLfloat AspectRatio;
 // Deklaracja zmiennej AspectRatio  określającej proporcję
 // wymiarów okna
+
 	if(vertical == 0)  // Zabezpieczenie przed dzieleniem przez 0
 		vertical = 1;
+
 	glViewport(0, 0, horizontal, vertical);
 // Ustawienie wielkościokna okna widoku (viewport)
 // W tym przypadku od (0,0) do (horizontal, vertical)
+
 	glMatrixMode(GL_PROJECTION);
 // Przełączenie macierzy bieżącej na macierz projekcji
+
 	glLoadIdentity();
 // Czyszcznie macierzy bieżącej
+
 	AspectRatio = (GLfloat)horizontal/(GLfloat)vertical;
 // Wyznaczenie współczynnika  proporcji okna
-// Gdy okno nie jest kwadratem wymagane jest określenie tak zwanej
-// przestrzeni ograniczającej pozwalającej zachować właściwe
-// proporcje rysowanego obiektu.
-// Do okreslenia przestrzeni ograniczjącej służy funkcja
-// glOrtho(...)
-	if(horizontal <= vertical)
-		glOrtho(-7.5,7.5,-7.5/AspectRatio,7.5/AspectRatio,10.0, -10.0);
-	else
-		glOrtho(-7.5*AspectRatio,7.5*AspectRatio,-7.5,7.5,10.0,-10.0);
+
+	gluPerspective(70, AspectRatio, 1, 30.0);
+	// Ustawienie parametrów dla rzutu perspektywicznego
+
 	glMatrixMode(GL_MODELVIEW);
 // Przełączenie macierzy bieżącej na macierz widoku modelu
 	glLoadIdentity();
@@ -697,13 +744,13 @@ int main(int argc, char* argv[])
 
 	glutInitWindowSize(300, 300);
 
-	glutCreateWindow("jajo");
+	glutCreateWindow("jajo - obrot kamery");
 
 	glutMouseFunc(Mouse);
-	// Ustala funkcjê zwrotn¹ odpowiedzialn¹ za badanie stanu myszy
+	// Ustala funkcje zwrotna odpowiedzialna za badanie stanu myszy
 
 	glutMotionFunc(Motion);
-	// Ustala funkcjê zwrotn¹ odpowiedzialn¹ za badanie ruchu myszy
+	// Ustala funkcje zwrotna odpowiedzialna za badanie ruchu myszy
 
 	glutDisplayFunc(RenderScene);
 // Określenie, że funkcja RenderScene będzie funkcją zwrotną
