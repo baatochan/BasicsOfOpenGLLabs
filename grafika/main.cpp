@@ -164,7 +164,7 @@ void Mouse(int btn, int state, int x, int y)
 		// jako pozycji poprzedniej
 		status = 1;          // wcięnięty został lewy klawisz myszy
 	} else if (btn==GLUT_RIGHT_BUTTON && state == GLUT_DOWN) {
-		zoom_pos_old=x;
+		zoom_pos_old=y;
 		status = 2;
 		//std::cout<<"MOUSEzoomold: "<<zoom_pos_old<<" x:"<<x<<" ";
 	}
