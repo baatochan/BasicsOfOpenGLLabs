@@ -20,6 +20,18 @@ point3 eggCordsColors[numberOfPoints][numberOfPoints]; // tablica zawierajaca ko
 
 int model = 3;  // 1- punkty, 2- siatka, 3 - wypełnione trójkąty, 4 - poprawna siatka
 
+static GLint status = 0;       // stan klawiszy myszy
+// 0 - nie naciœniêto ¿adnego klawisza
+// 1 - naciœniêty zostaæ lewy klawisz
+
+static int x_pos_old = 0;       // poprzednia pozycja kursora myszy
+static int y_pos_old = 0;       // poprzednia pozycja kursora myszy
+
+static int delta_x = 0;        // ró¿nica pomiêdzy pozycj¹ bie¿¹c¹
+// i poprzedni¹ kursora myszy
+static int delta_y = 0;        // ró¿nica pomiêdzy pozycj¹ bie¿¹c¹
+// i poprzedni¹ kursora myszy
+
 using namespace std;
 
 /**
@@ -491,6 +503,53 @@ void drawEgg() {
 	}
 }
 
+/*************************************************************************************/
+// Funkcja "bada" stan myszy i ustawia wartoœci odpowiednich zmiennych globalnych
+
+void Mouse(int btn, int state, int x, int y)
+{
+
+
+	if (btn == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+	{
+		x_pos_old = x;        // przypisanie aktualnie odczytanej pozycji kursora
+		// jako pozycji poprzedniej
+		y_pos_old = y;        // przypisanie aktualnie odczytanej pozycji kursora
+		// jako pozycji poprzedniej
+		status = 1;          // wciêniêty zosta³ lewy klawisz myszy
+	}
+	else
+
+	if (btn == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
+	{
+		y_pos_old = y;        // przypisanie aktualnie odczytanej pozycji kursora
+		// jako pozycji poprzedniej
+		status = 2;          // wciêniêty zosta³ lewy klawisz myszy
+	}
+	else
+		status = 0;          // nie zosta³ wciêniêty ¿aden klawisz
+}
+
+/*************************************************************************************/
+// Funkcja "monitoruje" po³o¿enie kursora myszy i ustawia wartoœci odpowiednich
+// zmiennych globalnych
+
+void Motion(GLsizei x, GLsizei y)
+{
+
+	delta_x = x - x_pos_old;     // obliczenie ró¿nicy po³o¿enia kursora myszy
+
+	x_pos_old = x;            // podstawienie bie¿¹cego po³o¿enia jako poprzednie
+
+	delta_y = y - y_pos_old;     // obliczenie ró¿nicy po³o¿enia kursora myszy
+
+	y_pos_old = y;            // podstawienie bie¿¹cego po³o¿enia jako poprzednie
+
+	glutPostRedisplay();     // przerysowanie obrazu sceny
+}
+
+/*************************************************************************************/
+
 // Funkcja rysująca osie układu współrzędnych
 void Axes(void)
 {
@@ -639,6 +698,12 @@ int main(int argc, char* argv[])
 	glutInitWindowSize(300, 300);
 
 	glutCreateWindow("jajo");
+
+	glutMouseFunc(Mouse);
+	// Ustala funkcjê zwrotn¹ odpowiedzialn¹ za badanie stanu myszy
+
+	glutMotionFunc(Motion);
+	// Ustala funkcjê zwrotn¹ odpowiedzialn¹ za badanie ruchu myszy
 
 	glutDisplayFunc(RenderScene);
 // Określenie, że funkcja RenderScene będzie funkcją zwrotną
