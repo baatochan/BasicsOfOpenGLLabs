@@ -2,13 +2,12 @@
 //  Szkielet programu do tworzenia modelu sceny 3-D z wizualizacją osi
 //  układu współrzędnych dla rzutowania perspektywicznego
 /*************************************************************************************/
-#include <windows.h>
 #include <gl/gl.h>
 #include <gl/glut.h>
-#include <iostream>
 
 typedef float point3[3];
 static GLfloat viewer[]= {0.0, 0.0, 10.0};
+
 // inicjalizacja położenia obserwatora
 static GLfloat thetaX = 0.0;   // kąt obrotu obiektu
 static GLfloat thetaY = 0.0;   // kąt obrotu obiektu
@@ -17,6 +16,7 @@ static GLfloat pix2angle;     // przelicznik pikseli na stopnie
 static GLint status = 0;       // stan klawiszy myszy
 // 0 - nie naciśnięto żadnego klawisza
 // 1 - naciśnięty zostać lewy klawisz
+// 2 - prawy klawisz
 
 static int x_pos_old=0;       // poprzednia pozycja kursora myszy (os x)
 static int delta_x = 0;        // różnica pomiędzy pozycją bieżącą (os x) i poprzednią kursora myszy
@@ -77,7 +77,6 @@ void RenderScene(void)
 		viewer[2] = viewer[2] + delta_zoom*pix2angle;
 		if (viewer[2] < 4) viewer[2] = 4;
 		if (viewer[2] > 90) viewer[2] = 90;
-		//std::cout<<"RENDERv2: "<<viewer[2]<<" deltazoom: "<<delta_zoom<<" dz*pa: "<<delta_zoom*pix2angle<<std::endl;
 	}
 
 	gluLookAt(viewer[0],viewer[1],viewer[2], 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
@@ -166,7 +165,6 @@ void Mouse(int btn, int state, int x, int y)
 	} else if (btn==GLUT_RIGHT_BUTTON && state == GLUT_DOWN) {
 		zoom_pos_old=y;
 		status = 2;
-		//std::cout<<"MOUSEzoomold: "<<zoom_pos_old<<" x:"<<x<<" ";
 	}
 	else
 
@@ -191,8 +189,6 @@ void Motion( GLsizei x, GLsizei y )
 	delta_zoom=x-zoom_pos_old;     // obliczenie różnicy położenia kursora myszy
 
 	zoom_pos_old=x;            // podstawienie bieżącego położenia jako poprzednie
-
-	//std::cout<<"MOTIONdeltazoom: "<<delta_zoom<<" x: "<<x<<" zoomold: "<<zoom_pos_old<<" ";
 
 	glutPostRedisplay();     // przerysowanie obrazu sceny
 }
