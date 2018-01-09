@@ -16,9 +16,6 @@ typedef float point3[3];
 static GLfloat theta[] = {0, 0, 0}; // trzy kąty obrotu
 
 point3 eggCords[numberOfPoints][numberOfPoints]; // tablica zawierajaca wspolrzedne punktow jajka
-point3 eggCordsColors[numberOfPoints][numberOfPoints]; // tablica zawierajaca kolory dla kazdego punkta jajka
-
-int model = 3;  // 1- punkty, 2- siatka, 3 - wypełnione trójkąty, 4 - poprawna siatka
 
 using namespace std;
 
@@ -64,430 +61,132 @@ void countEggCords() {
 }
 
 /**
- * funckja zwracajaca losowa wartosc z zakresu [0,1]; przydatna do podawania losowych kolorow
- */
-float getRandomColor() {
-	int random = rand() % 10001; //generuj losowa wartosc z zakresu [0, 10000]
-	float color = (float)random / 10000; // podziel na 10k, wiec zakres zmienia sie na [0,1]
-
-	return color;
-}
-
-/**
- * Funkcja losojaca kolory dla wszystckich punktow rysunku
- */
-void loadRandomColors() {
-	for (int i = 0; i < numberOfPoints; i++) {
-		for (int j = 0; j < numberOfPoints; j++) {
-			eggCordsColors[i][j][0] = getRandomColor();
-			eggCordsColors[i][j][1] = getRandomColor();
-			eggCordsColors[i][j][2] = getRandomColor();
-		}
-	}
-}
-
-/**
- * Funkcja rysujaca jajko. Posiada trzy przypadki w zaleznosci od ustawienia modelu:
- * 1 - wysuje siatke punktow
- * 2 - rysuje siatke linii laczaca punktu
- * 3 - rysuje bryle jajka zlozona z trojkatow
+ * Funkcja rysujaca jajko.
  */
 void drawEgg() {
-	if (model == 1) { // przypadek pierwszy - rysuj punkty
-		glBegin(GL_POINTS);
-		glColor3f(1,0,0);
-		for (int i = 0; i < numberOfPoints; i++) {
-			//glColor3f(getRandomColor(), getRandomColor(), getRandomColor());
-			/*if (i == 8) {glColor3f(0,1,0);}
-			else {glColor3f(1,0,0);}*/
+	glColor3f(1,1,1);
+	int k = 0;
+	int l = 0;
+	int m = 0;
+	int n = 0;
+	int o = 0;
+	for (int i = 0; i < numberOfPoints; i++) {
+		if (i == 0) {
 			for (int j = 0; j < numberOfPoints; j++) {
-				/*if (i == 0 && j == 0) {glColor3f(0,1,0);}
-				else {glColor3f(1,0,0);}*/
-				glVertex3fv(eggCords[i][j]); // wypisuje kazdy punkt jeden raz do GL_POINTS
-			}
-		}
-		glEnd();
-	} else if (model == 2) { // przypadek drugi - rysuj siatke linii
-		bool whatToDraw[3] = {
-				true,
-				true,
-				true
-		}; // pionowe, poziome, wierzcholki
+				k = 1;
+				glBegin(GL_TRIANGLES);
+				glVertex3fv(eggCords[0][0]);
 
-		if (whatToDraw[0]) {
-			for (int i = 0; i < numberOfPoints; i++) { //rysowanie lini poziomych
-				if (i == 0 || (i == numberOfPoints / 2 && numberOfPoints % 2 == 0))
-					continue; //nie rysuj linni dla punktow znajdujacych sie w pierszej kolumnie i srodkowej kolumnie - sa to gorne i dolne wierzcholki jajka ktore maja jedna i ta sama wartosc
-				glBegin(GL_LINES);
-				glColor3f(0, 1, 0);
-				//glColor3f(0, 0.5, 0.5);
-				for (int j = 0; j < numberOfPoints; j++) {
-					/**
-					 * Rysowanie polega na podaniu kolejnych punktow do linii, jednak nie wystarczy ich po prostu wypisac.
-					 * GL_LINES wymaga wypisywanie linii odcinkami, wiec 1szy pkt danej linii musi byc podany raz, kazdy kolejny dwa razy.
-					 * Normlanie ostatni punkt powinien byc podany jeden raz, jednak aby zakonczyc pierscien nalezy go polaczyc z pkt z innej kolumny (dla i, jest to kolumna numberOfPoints-i)
-					 * Stad tez pierwszy podawany pkt jest podawany raz dla j == 0, dla kazdego kolejnego dwa razy, gdy j == numberOfPoints - 1 (maksymalna wartosc) dopisany zostaje pierwsyz punkt z odpowiadajacej kolumny
-					 */
-					if (j != 0) {
-						glVertex3fv(eggCords[i][j]);
-					}
-					//if (i == 0 && j == numberOfPoints - 1) continue;
-					//if (i == numberOfPoints / 2 && numberOfPoints % 2 == 0 && j == numberOfPoints - 1) continue;
-					glVertex3fv(eggCords[i][j]);
-					if (j == numberOfPoints - 1) {
-						glVertex3fv(eggCords[numberOfPoints - i][0]);
-					}
+				glVertex3fv(eggCords[k][j]);
+
+				if (j + 1 == numberOfPoints) {
+					glVertex3fv(eggCords[numberOfPoints-1][0]);
+				}
+				else {
+					glVertex3fv(eggCords[k][j + 1]);
 				}
 				glEnd();
 			}
-		}
-		if (whatToDraw[1]) {
-			for (int i = 0; i < numberOfPoints; i++) { // rysowanie linii pionowych
-				glBegin(GL_LINES);
-				//glColor3f(0.5, 0.5, 0);
-				glColor3f(0, 1, 0);
-				for (int j = 0; j < numberOfPoints; j++) {
-					// schemat rysowania taki sam jak powyzej
-					if (j != 0) {
-						glVertex3fv(eggCords[j][i]);
-					}
-					glVertex3fv(eggCords[j][i]);
-					if (j == numberOfPoints - 1) {
-						glVertex3fv(eggCords[0][0]);
-					}
+		} else if (i == numberOfPoints - 1) {
+			for (int j = 0; j < numberOfPoints; j++) {
+				k = 1;
+				glBegin(GL_TRIANGLES);
+				glVertex3fv(eggCords[0][0]);
+
+				glVertex3fv(eggCords[i][j]);
+
+				if (j + 1 == numberOfPoints) {
+					glVertex3fv(eggCords[1][0]);
+				}
+				else {
+					glVertex3fv(eggCords[i][j + 1]);
 				}
 				glEnd();
 			}
-		}
-		if (whatToDraw[2]) { //rysowanie wierzcholkow
-			glBegin(GL_POINTS);
-			//glColor3f(0, 0.5, 0.5);
-			glColor3f(0, 1, 0);
-			glVertex3fv(eggCords[0][0]); //wierzcholek dolny
-			if (numberOfPoints % 2 == 0) {
-				glVertex3fv(eggCords[numberOfPoints/2][0]); //wierzcholek gorny (o ile istnieje)
+		} else if (i == (numberOfPoints / 2) - 1 && numberOfPoints % 2 == 0) {
+			for (int j = 0; j < numberOfPoints; j++) {
+				k = numberOfPoints / 2;
+				glBegin(GL_TRIANGLES);
+				glVertex3fv(eggCords[k][0]);
+
+				glVertex3fv(eggCords[i][j]);
+
+				if (j + 1 == numberOfPoints) {
+					glVertex3fv(eggCords[k+1][0]);
+				}
+				else {
+					glVertex3fv(eggCords[i][j + 1]);
+				}
+				glEnd();
 			}
-			glEnd();
-		}
-	} else if (model == 3) { // przypadek trzeci - rysuj bryle jajka
-		int k = 0;
-		int l = 0;
-		int m = 0;
-		int n = 0;
-		int o = 0;
-		for (int i = 0; i < numberOfPoints; i++) {
-			if (i == 0) {
-				for (int j = 0; j < numberOfPoints; j++) {
-					k = 1;
-					glBegin(GL_TRIANGLES);
-					glColor3fv(eggCordsColors[0][0]);
-					glVertex3fv(eggCords[0][0]);
+		} else if (i == numberOfPoints / 2 && numberOfPoints % 2 == 0) {
+			for (int j = 0; j < numberOfPoints; j++) {
+				k = numberOfPoints / 2 + 1;
+				glBegin(GL_TRIANGLES);
+				glVertex3fv(eggCords[i][0]);
 
-					glColor3fv(eggCordsColors[k][j]);
-					glVertex3fv(eggCords[k][j]);
+				glVertex3fv(eggCords[k][j]);
 
-					if (j + 1 == numberOfPoints) {
-						glColor3fv(eggCordsColors[numberOfPoints-1][0]);
-						glVertex3fv(eggCords[numberOfPoints-1][0]);
-					}
-					else {
-						glColor3fv(eggCordsColors[k][j + 1]);
-						glVertex3fv(eggCords[k][j + 1]);
-					}
-					glEnd();
+				if (j + 1 == numberOfPoints) {
+					glVertex3fv(eggCords[k-2][0]);
 				}
-			} else if (i == numberOfPoints - 1) {
-				for (int j = 0; j < numberOfPoints; j++) {
-					k = 1;
-					glBegin(GL_TRIANGLES);
-					glColor3fv(eggCordsColors[0][0]);
-					glVertex3fv(eggCords[0][0]);
-
-					glColor3fv(eggCordsColors[i][j]);
-					glVertex3fv(eggCords[i][j]);
-
-					if (j + 1 == numberOfPoints) {
-						glColor3fv(eggCordsColors[1][0]);
-						glVertex3fv(eggCords[1][0]);
-					}
-					else {
-						glColor3fv(eggCordsColors[i][j + 1]);
-						glVertex3fv(eggCords[i][j + 1]);
-					}
-					glEnd();
+				else {
+					glVertex3fv(eggCords[k][j + 1]);
 				}
-			} else if (i == (numberOfPoints / 2) - 1 && numberOfPoints % 2 == 0) {
-				for (int j = 0; j < numberOfPoints; j++) {
-					k = numberOfPoints / 2;
-					glBegin(GL_TRIANGLES);
-					glColor3fv(eggCordsColors[k][0]);
-					glVertex3fv(eggCords[k][0]);
+				glEnd();
+			}
+		} else if (numberOfPoints % 2 == 1 && i == (numberOfPoints - 1) / 2) {
+			for (int j = 0; j < numberOfPoints - 1; j++) {
+				k = i + 1;
+				glBegin(GL_TRIANGLES);
+				glVertex3fv(eggCords[i][j]);
 
-					glColor3fv(eggCordsColors[i][j]);
-					glVertex3fv(eggCords[i][j]);
+				glVertex3fv(eggCords[k][numberOfPoints - 1 - j]);
 
-					if (j + 1 == numberOfPoints) {
-						glColor3fv(eggCordsColors[k+1][0]);
-						glVertex3fv(eggCords[k+1][0]);
-					}
-					else {
-						glColor3fv(eggCordsColors[i][j + 1]);
-						glVertex3fv(eggCords[i][j + 1]);
-					}
-					glEnd();
+				glVertex3fv(eggCords[i][j + 1]);
+				glEnd();
+			}
+		} else if (numberOfPoints % 2 == 1 && i == (numberOfPoints + 1) / 2) {
+			for (int j = 0; j < numberOfPoints - 1; j++) {
+				k = i - 1;
+				glBegin(GL_TRIANGLES);
+				glVertex3fv(eggCords[i][j]);
+
+				glVertex3fv(eggCords[k][numberOfPoints - 1 - j]);
+
+				glVertex3fv(eggCords[i][j + 1]);
+				glEnd();
+			}
+		} else {
+			for (int j = 0; j < numberOfPoints; j++) {
+				k = i + 1;
+				l = j + 1;
+				m = i + 1;
+				n = j + 1;
+				o = i;
+				if (l == numberOfPoints) {
+					n = 0;
+					o = numberOfPoints - i;
+					m = numberOfPoints - i - 1;
 				}
-			} else if (i == numberOfPoints / 2 && numberOfPoints % 2 == 0) {
-				for (int j = 0; j < numberOfPoints; j++) {
-					k = numberOfPoints / 2 + 1;
-					glBegin(GL_TRIANGLES);
-					glColor3fv(eggCordsColors[i][0]);
-					glVertex3fv(eggCords[i][0]);
 
-					glColor3fv(eggCordsColors[k][j]);
-					glVertex3fv(eggCords[k][j]);
+				glBegin(GL_TRIANGLES);
+				glVertex3fv(eggCords[i][j]);
 
-					if (j + 1 == numberOfPoints) {
-						glColor3fv(eggCordsColors[k-2][0]);
-						glVertex3fv(eggCords[k-2][0]);
-					}
-					else {
-						glColor3fv(eggCordsColors[k][j + 1]);
-						glVertex3fv(eggCords[k][j + 1]);
-					}
-					glEnd();
-				}
-			} else if (numberOfPoints % 2 == 1 && i == (numberOfPoints - 1) / 2) {
-				for (int j = 0; j < numberOfPoints - 1; j++) {
-					k = i + 1;
-					glBegin(GL_TRIANGLES);
-					glColor3fv(eggCordsColors[i][j]);
-					glVertex3fv(eggCords[i][j]);
+				glVertex3fv(eggCords[k][j]);
 
-					glColor3fv(eggCordsColors[k][numberOfPoints - 1 - j]);
-					glVertex3fv(eggCords[k][numberOfPoints - 1 - j]);
+				glVertex3fv(eggCords[o][n]);
+				glEnd();
 
-					glColor3fv(eggCordsColors[i][j + 1]);
-					glVertex3fv(eggCords[i][j + 1]);
-					glEnd();
-				}
-			} else if (numberOfPoints % 2 == 1 && i == (numberOfPoints + 1) / 2) {
-				for (int j = 0; j < numberOfPoints - 1; j++) {
-					k = i - 1;
-					glBegin(GL_TRIANGLES);
-					glColor3fv(eggCordsColors[i][j]);
-					glVertex3fv(eggCords[i][j]);
+				glBegin(GL_TRIANGLES);
+				glVertex3fv(eggCords[m][n]);
 
-					glColor3fv(eggCordsColors[k][numberOfPoints - 1 - j]);
-					glVertex3fv(eggCords[k][numberOfPoints - 1 - j]);
+				glVertex3fv(eggCords[k][j]);
 
-					glColor3fv(eggCordsColors[i][j + 1]);
-					glVertex3fv(eggCords[i][j + 1]);
-					glEnd();
-				}
-			} else {
-				for (int j = 0; j < numberOfPoints; j++) {
-					k = i + 1;
-					l = j + 1;
-					m = i + 1;
-					n = j + 1;
-					o = i;
-					if (l == numberOfPoints) {
-						n = 0;
-						o = numberOfPoints - i;
-						m = numberOfPoints - i - 1;
-					}
-
-					glBegin(GL_TRIANGLES);
-					glColor3fv(eggCordsColors[i][j]);
-					glVertex3fv(eggCords[i][j]);
-
-					glColor3fv(eggCordsColors[k][j]);
-					glVertex3fv(eggCords[k][j]);
-
-					glColor3fv(eggCordsColors[o][n]);
-					glVertex3fv(eggCords[o][n]);
-					glEnd();
-
-					glBegin(GL_TRIANGLES);
-					glColor3fv(eggCordsColors[m][n]);
-					glVertex3fv(eggCords[m][n]);
-
-					glColor3fv(eggCordsColors[k][j]);
-					glVertex3fv(eggCords[k][j]);
-
-					glColor3fv(eggCordsColors[o][n]);
-					glVertex3fv(eggCords[o][n]);
-					glEnd();
-				}
+				glVertex3fv(eggCords[o][n]);
+				glEnd();
 			}
 		}
-	} else if (model == 4) { // przypadek czwarty - rysuj poprawna siatke
-		int k = 0;
-		int l = 0;
-		int m = 0;
-		int n = 0;
-		int o = 0;
-		for (int i = 0; i < numberOfPoints; i++) {
-			if (i == 0) {
-				for (int j = 0; j < numberOfPoints; j++) {
-					k = 1;
-					glBegin(GL_LINES);
-					glColor3f(1.0,0,1.0);
-
-					glVertex3fv(eggCords[0][0]);
-
-					glVertex3fv(eggCords[k][j]);
-
-					if (j + 1 == numberOfPoints) {
-						glVertex3fv(eggCords[k][j]);
-						glVertex3fv(eggCords[numberOfPoints - 1][0]);
-						glVertex3fv(eggCords[numberOfPoints - 1][0]);
-						glVertex3fv(eggCords[0][0]);
-					} else {
-						glVertex3fv(eggCords[k][j]);
-						glVertex3fv(eggCords[k][j + 1]);
-						glVertex3fv(eggCords[k][j + 1]);
-						glVertex3fv(eggCords[0][0]);
-					}
-					glEnd();
-				}
-			} else if (i == numberOfPoints - 1) {
-				for (int j = 0; j < numberOfPoints; j++) {
-					k = 1;
-					glBegin(GL_LINES);
-					glVertex3fv(eggCords[0][0]);
-
-					glVertex3fv(eggCords[i][j]);
-
-					if (j + 1 == numberOfPoints) {
-						glVertex3fv(eggCords[i][j]);
-						glVertex3fv(eggCords[1][0]);
-						glVertex3fv(eggCords[1][0]);
-						glVertex3fv(eggCords[0][0]);
-					} else {
-						glVertex3fv(eggCords[i][j]);
-						glVertex3fv(eggCords[i][j + 1]);
-						glVertex3fv(eggCords[i][j + 1]);
-						glVertex3fv(eggCords[0][0]);
-					}
-					glEnd();
-				}
-			} else if (i == (numberOfPoints / 2) - 1 && numberOfPoints % 2 == 0) {
-				for (int j = 0; j < numberOfPoints; j++) {
-					k = numberOfPoints / 2;
-					glBegin(GL_LINES);
-					glVertex3fv(eggCords[k][0]);
-
-					glVertex3fv(eggCords[i][j]);
-
-					if (j + 1 == numberOfPoints) {
-						glVertex3fv(eggCords[i][j]);
-						glVertex3fv(eggCords[k + 1][0]);
-						glVertex3fv(eggCords[k + 1][0]);
-						glVertex3fv(eggCords[k][0]);
-					} else {
-						glVertex3fv(eggCords[i][j]);
-						glVertex3fv(eggCords[i][j + 1]);
-						glVertex3fv(eggCords[i][j + 1]);
-						glVertex3fv(eggCords[k][0]);
-					}
-					glEnd();
-				}
-			} else if (i == numberOfPoints / 2 && numberOfPoints % 2 == 0) {
-				for (int j = 0; j < numberOfPoints; j++) {
-					k = numberOfPoints / 2 + 1;
-					glBegin(GL_LINES);
-					glVertex3fv(eggCords[i][0]);
-
-					glVertex3fv(eggCords[k][j]);
-
-					if (j + 1 == numberOfPoints) {
-						glVertex3fv(eggCords[k][j]);
-						glVertex3fv(eggCords[k - 2][0]);
-						glVertex3fv(eggCords[k - 2][0]);
-						glVertex3fv(eggCords[i][0]);
-
-					} else {
-						glVertex3fv(eggCords[k][j]);
-						glVertex3fv(eggCords[k][j + 1]);
-						glVertex3fv(eggCords[k][j + 1]);
-						glVertex3fv(eggCords[i][0]);
-
-					}
-					glEnd();
-				}
-			} else if (numberOfPoints % 2 == 1 && i == (numberOfPoints - 1) / 2) {
-				for (int j = 0; j < numberOfPoints - 1; j++) {
-					k = i + 1;
-					glBegin(GL_LINES);
-					glVertex3fv(eggCords[i][j]);
-
-					glVertex3fv(eggCords[k][numberOfPoints - 1 - j]);
-					glVertex3fv(eggCords[k][numberOfPoints - 1 - j]);
-
-					glVertex3fv(eggCords[i][j + 1]);
-					glVertex3fv(eggCords[i][j + 1]);
-					glVertex3fv(eggCords[i][j]);
-
-					glEnd();
-				}
-			} else if (numberOfPoints % 2 == 1 && i == (numberOfPoints + 1) / 2) {
-				for (int j = 0; j < numberOfPoints - 1; j++) {
-					k = i - 1;
-					glBegin(GL_LINES);
-					glVertex3fv(eggCords[i][j]);
-
-					glVertex3fv(eggCords[k][numberOfPoints - 1 - j]);
-					glVertex3fv(eggCords[k][numberOfPoints - 1 - j]);
-
-					glVertex3fv(eggCords[i][j + 1]);
-					glVertex3fv(eggCords[i][j + 1]);
-					glVertex3fv(eggCords[i][j]);
-
-					glEnd();
-				}
-			} else {
-				for (int j = 0; j < numberOfPoints; j++) {
-					k = i + 1;
-					l = j + 1;
-					m = i + 1;
-					n = j + 1;
-					o = i;
-					if (l == numberOfPoints) {
-						n = 0;
-						o = numberOfPoints - i;
-						m = numberOfPoints - i - 1;
-					}
-
-					glBegin(GL_LINES);
-					glVertex3fv(eggCords[i][j]);
-
-					glVertex3fv(eggCords[k][j]);
-					glVertex3fv(eggCords[k][j]);
-
-					glVertex3fv(eggCords[o][n]);
-					glVertex3fv(eggCords[o][n]);
-					glVertex3fv(eggCords[i][j]);
-
-					glEnd();
-
-					glBegin(GL_LINES);
-					glVertex3fv(eggCords[m][n]);
-
-					glVertex3fv(eggCords[k][j]);
-					glVertex3fv(eggCords[k][j]);
-
-					glVertex3fv(eggCords[o][n]);
-					glVertex3fv(eggCords[o][n]);
-					glVertex3fv(eggCords[m][n]);
-
-					glEnd();
-				}
-			}
-		}
-	} else {
-		model = 1;
-		drawEgg();
 	}
 }
 
@@ -567,17 +266,6 @@ void spinEgg()
 	glutPostRedisplay(); //odświeżenie zawartości aktualnego okna
 }
 
-// funckja reakcji na klawiature - zmiana modelu rysowanego w zaleznosci od klawisza
-void keys(unsigned char key, int x, int y)
-{
-	if(key == 'q') model = 1;
-	if(key == 't') model = 2;
-	if(key == 'e') model = 3;
-	if(key == 'w') model = 4;
-
-	RenderScene(); // przerysowanie obrazu sceny
-}
-
 /*************************************************************************************/
 // Funkcja ustalająca stan renderowania
 
@@ -629,7 +317,6 @@ int main(int argc, char* argv[])
 {
 	srand(time(0)); // ziarno dla liczb pseudo losowych
 
-	loadRandomColors(); // pojedyncze wywolanie losowania randomowych kolorow
 	countEggCords(); // pojedyncze wywolanie wyliczen wierzcholkow jajka
 
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB |GLUT_DEPTH);
@@ -647,8 +334,6 @@ int main(int argc, char* argv[])
 	glutReshapeFunc(ChangeSize);
 // Dla aktualnego okna ustala funkcję zwrotną odpowiedzialną
 // zazmiany rozmiaru okna
-
-	glutKeyboardFunc(keys); //zdefiniowanie funkcji reakcji na klawiature
 
 	glutIdleFunc(spinEgg); //zdefiniowanie funckji obrotu jajka
 
