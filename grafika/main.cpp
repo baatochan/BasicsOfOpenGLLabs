@@ -393,7 +393,7 @@ void MyInit(void) {
 // Definicja źródła światła
 
 
-	GLfloat light_position[] = {0.0, 0.0, 10.0, 1.0};
+	GLfloat light_position[] = {0, 0, -30.0, 1.0};
 	// położenie źródła
 
 
@@ -401,7 +401,7 @@ void MyInit(void) {
 	// składowe intensywności świecenia źródła światła otoczenia
 	// Ia = [Iar,Iag,Iab]
 
-	GLfloat light_diffuse[] = {1.0, 1.0, 1.0, 1.0};
+	GLfloat light_diffuse[] = {1.0, 1.0, 0, 1.0};
 	// składowe intensywności świecenia źródła światła powodującego
 	// odbicie dyfuzyjne Id = [Idr,Idg,Idb]
 
