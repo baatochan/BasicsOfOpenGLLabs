@@ -15,8 +15,32 @@ typedef float point3[3];
 
 static GLfloat theta[] = {0, 0, 0}; // trzy kąty obrotu
 
-static GLfloat light1pos[] = {3, 0, -30, 1.0};
-static GLfloat light2pos[] = {-3, 0, -30, 1.0};
+static GLfloat light1pos[] = {0, -30, 0, 1.0};
+static GLfloat light2pos[] = {0, -30, 0, 1.0};
+
+static GLfloat pix2angle;     // przelicznik pikseli na stopnie
+static GLfloat pix2angley;     // przelicznik pikseli na stopnie y
+
+static GLfloat thetaCam1 = -2.0;   // kat obrotu obiektu x
+static GLfloat fiCam1 = 0.0;   // kat obrotu obiektu y
+static GLfloat RCam1 = 30;
+
+static GLfloat thetaCam2 = -1.0;   // kat obrotu obiektu x
+static GLfloat fiCam2 = 0.0;   // kat obrotu obiektu y
+static GLfloat RCam2 = 30;
+
+static GLint status = 0;       // stan klawiszy myszy
+// 0 - nie nacisnieto zadnego klawisza
+// 1 - nacisniety zostal lewy klawisz
+// 2 - prawy klawisz
+
+static int x_pos_old = 0;       // poprzednia pozycja kursora myszy
+static int y_pos_old = 0;       // poprzednia pozycja kursora myszy
+
+static int delta_x = 0;        // róznica pomiedzy pozycja biezaca
+// i poprzednia kursora myszy
+static int delta_y = 0;        // róznica pomiedzy pozycja biezaca
+// i poprzednia kursora myszy
 
 point3 eggCords[numberOfPoints][numberOfPoints]; // tablica zawierajaca wspolrzedne punktow jajka
 point3 normalVector[numberOfPoints][numberOfPoints];
@@ -288,6 +312,51 @@ void drawEgg() {
 	}
 }
 
+/*************************************************************************************/
+
+// Funkcja "bada" stan myszy i ustawia wartosci odpowiednich zmiennych globalnych
+void Mouse(int btn, int state, int x, int y)
+{
+
+
+	if (btn == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+	{
+		x_pos_old = x;        // przypisanie aktualnie odczytanej pozycji kursora
+		// jako pozycji poprzedniej
+		y_pos_old = y;        // przypisanie aktualnie odczytanej pozycji kursora
+		// jako pozycji poprzedniej
+		status = 1;          // wcieniety zostal lewy klawisz myszy
+	}
+	else
+
+	if (btn == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
+	{
+		y_pos_old = y;        // przypisanie aktualnie odczytanej pozycji kursora
+		// jako pozycji poprzedniej
+		status = 2;          // wcieniety zostal prawy klawisz myszy
+	}
+	else
+		status = 0;          // nie zostal wcieniety zaden klawisz
+}
+
+/*************************************************************************************/
+
+// Funkcja "monitoruje" polozenie kursora myszy i ustawia wartosci odpowiednich
+// zmiennych globalnych
+void Motion(GLsizei x, GLsizei y)
+{
+
+	delta_x = x - x_pos_old;     // obliczenie róznicy polozenia kursora myszy
+
+	x_pos_old = x;            // podstawienie biezacego polozenia jako poprzednie
+
+	delta_y = y - y_pos_old;     // obliczenie róznicy polozenia kursora myszy
+
+	y_pos_old = y;            // podstawienie biezacego polozenia jako poprzednie
+
+	glutPostRedisplay();     // przerysowanie obrazu sceny
+}
+
 // Funkcja rysująca osie układu współrzędnych
 void Axes() {
 	point3  x_min = {-5.0, 0.0, 0.0};
@@ -331,6 +400,47 @@ void RenderScene() {
 // Czyszczenie macierzy bieżącej
 	Axes();
 // Narysowanie osi przy pomocy funkcji zdefiniowanej wyżej
+
+	if (status == 1)                     // jesli lewy klawisz myszy wcieniety
+	{
+
+		thetaCam1 += float(delta_x*pix2angle);    // modyfikacja kata obrotu o kat proporcjonalny
+		fiCam1 -= float(delta_y*pix2angley);
+
+		(thetaCam1 > 2 * M_PI) ? thetaCam1 -= 2 * M_PI : thetaCam1;
+		(thetaCam1 < 0) ? thetaCam1 += 2 * M_PI : thetaCam1;
+
+
+		(fiCam1 > 2 * M_PI) ? fiCam1 -= 2 * M_PI : fiCam1;
+		(fiCam1 < 0) ? fiCam1 += 2 * M_PI : fiCam1;
+
+	}                                  // do róznicy polozeñ kursora myszy
+
+
+
+	if (status == 2)                     // jesli prawy klawisz myszy wcieniety
+	{
+		thetaCam2 += float(delta_x*pix2angle);    // modyfikacja kata obrotu o kat proporcjonalny
+		fiCam2 -= float(delta_y*pix2angley);
+
+		(thetaCam2 > 2 * M_PI) ? thetaCam2 -= 2 * M_PI : thetaCam2;
+		(thetaCam2 < 0) ? thetaCam2 += 2 * M_PI : thetaCam2;
+
+
+		(fiCam2 > 2 * M_PI) ? fiCam2 -= 2 * M_PI : fiCam2;
+		(fiCam2 < 0) ? fiCam2 += 2 * M_PI : fiCam2;
+	}
+
+	light1pos[0] = RCam1*cos(thetaCam1)*cos(fiCam1);
+	light1pos[1] = RCam1*sin(fiCam1);
+	light1pos[2] = RCam1*sin(thetaCam1)*cos(fiCam1);
+
+	light2pos[0] = RCam2*cos(thetaCam2)*cos(fiCam2);
+	light2pos[1] = RCam2*sin(fiCam2);
+	light2pos[2] = RCam2*sin(thetaCam2)*cos(fiCam2);
+
+	glLightfv(GL_LIGHT0, GL_POSITION, light1pos);
+	glLightfv(GL_LIGHT1, GL_POSITION, light2pos);
 
 	glRotatef(theta[0], 1.0, 0.0, 0.0);
 
@@ -478,6 +588,8 @@ void MyInit(void) {
 // Parametry vertical i horizontal (wysokość i szerokość okna) są
 // przekazywane do funkcji za każdym razem gdy zmieni się rozmiar okna.
 void ChangeSize(GLsizei horizontal, GLsizei vertical ) {
+	pix2angle = 2 * M_PI / (float)horizontal / 3;  // przeliczenie pikseli na stopnie
+	pix2angley = 2 * M_PI / (float)vertical / 3;  // przeliczenie pikseli na stopnie
 	GLfloat AspectRatio;
 // Deklaracja zmiennej AspectRatio  określającej proporcję
 // wymiarów okna
@@ -521,7 +633,13 @@ int main(int argc, char* argv[]) {
 
 	glutInitWindowSize(300, 300);
 
-	glutCreateWindow("jajo");
+	glutCreateWindow("jajo - obrot swiatel");
+
+	glutMouseFunc(Mouse);
+	// Ustala funkcje zwrotna odpowiedzialna za badanie stanu myszy
+
+	glutMotionFunc(Motion);
+	// Ustala funkcje zwrotna odpowiedzialna za badanie ruchu myszy
 
 	glutDisplayFunc(RenderScene);
 // Określenie, że funkcja RenderScene będzie funkcją zwrotną
@@ -531,7 +649,7 @@ int main(int argc, char* argv[]) {
 // Dla aktualnego okna ustala funkcję zwrotną odpowiedzialną
 // zazmiany rozmiaru okna
 
-	glutIdleFunc(spinEgg); //zdefiniowanie funckji obrotu jajka
+	//glutIdleFunc(spinEgg); //zdefiniowanie funckji obrotu jajka
 
 	MyInit();
 // Funkcja MyInit() (zdefiniowana powyżej) wykonuje wszelkie
