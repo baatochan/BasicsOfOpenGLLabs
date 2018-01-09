@@ -15,6 +15,9 @@ typedef float point3[3];
 
 static GLfloat theta[] = {0, 0, 0}; // trzy kąty obrotu
 
+static GLfloat light1pos[] = {3, 0, -30, 1.0};
+static GLfloat light2pos[] = {-3, 0, -30, 1.0};
+
 point3 eggCords[numberOfPoints][numberOfPoints]; // tablica zawierajaca wspolrzedne punktow jajka
 point3 normalVector[numberOfPoints][numberOfPoints];
 
@@ -393,7 +396,7 @@ void MyInit(void) {
 // Definicja źródła światła
 
 
-	GLfloat light_position[] = {0, 0, -30.0, 1.0};
+	//GLfloat light_position[] = {0, 0, -30.0, 1.0};
 	// położenie źródła
 
 
@@ -401,7 +404,8 @@ void MyInit(void) {
 	// składowe intensywności świecenia źródła światła otoczenia
 	// Ia = [Iar,Iag,Iab]
 
-	GLfloat light_diffuse[] = {1.0, 1.0, 0, 1.0};
+	GLfloat light1_diffuse[] = {1.0, 0, 0, 1.0};
+	GLfloat light2_diffuse[] = {0, 0, 1.0, 1.0};
 	// składowe intensywności świecenia źródła światła powodującego
 	// odbicie dyfuzyjne Id = [Idr,Idg,Idb]
 
@@ -438,13 +442,22 @@ void MyInit(void) {
 // Ustawienie parametrów źródła
 
 	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light1_diffuse);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	glLightfv(GL_LIGHT0, GL_POSITION, light1pos);
 
 	glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, att_constant);
 	glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, att_linear);
 	glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, att_quadratic);
+
+	glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, light2_diffuse);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, light_specular);
+	glLightfv(GL_LIGHT1, GL_POSITION, light2pos);
+
+	glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, att_constant);
+	glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, att_linear);
+	glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, att_quadratic);
 
 
 /*************************************************************************************/
@@ -453,6 +466,7 @@ void MyInit(void) {
 	glShadeModel(GL_SMOOTH); // właczenie łagodnego cieniowania
 	glEnable(GL_LIGHTING);   // właczenie systemu oświetlenia sceny
 	glEnable(GL_LIGHT0);     // włączenie źródła o numerze 0
+	glEnable(GL_LIGHT1);     // włączenie źródła o numerze 1
 	glEnable(GL_DEPTH_TEST); // włączenie mechanizmu z-bufora
 
 /*************************************************************************************/
