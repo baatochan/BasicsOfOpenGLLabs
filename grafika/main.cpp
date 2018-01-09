@@ -142,14 +142,18 @@ void drawEgg() {
 			for (int j = 0; j < numberOfPoints; j++) {
 				k = 1;
 				glBegin(GL_TRIANGLES);
+				glNormal3fv(eggCords[0][0]);
 				glVertex3fv(eggCords[0][0]);
 
+				glNormal3fv(eggCords[k][j]);
 				glVertex3fv(eggCords[k][j]);
 
 				if (j + 1 == numberOfPoints) {
+					glNormal3fv(eggCords[numberOfPoints-1][0]);
 					glVertex3fv(eggCords[numberOfPoints-1][0]);
 				}
 				else {
+					glNormal3fv(eggCords[k][j + 1]);
 					glVertex3fv(eggCords[k][j + 1]);
 				}
 				glEnd();
@@ -158,14 +162,18 @@ void drawEgg() {
 			for (int j = 0; j < numberOfPoints; j++) {
 				k = 1;
 				glBegin(GL_TRIANGLES);
+				glNormal3fv(eggCords[0][0]);
 				glVertex3fv(eggCords[0][0]);
 
+				glNormal3fv(eggCords[i][j]);
 				glVertex3fv(eggCords[i][j]);
 
 				if (j + 1 == numberOfPoints) {
+					glNormal3fv(eggCords[1][0]);
 					glVertex3fv(eggCords[1][0]);
 				}
 				else {
+					glNormal3fv(eggCords[i][j + 1]);
 					glVertex3fv(eggCords[i][j + 1]);
 				}
 				glEnd();
@@ -174,14 +182,18 @@ void drawEgg() {
 			for (int j = 0; j < numberOfPoints; j++) {
 				k = numberOfPoints / 2;
 				glBegin(GL_TRIANGLES);
+				glNormal3fv(eggCords[k][0]);
 				glVertex3fv(eggCords[k][0]);
 
+				glNormal3fv(eggCords[i][j]);
 				glVertex3fv(eggCords[i][j]);
 
 				if (j + 1 == numberOfPoints) {
+					glNormal3fv(eggCords[k+1][0]);
 					glVertex3fv(eggCords[k+1][0]);
 				}
 				else {
+					glNormal3fv(eggCords[i][j + 1]);
 					glVertex3fv(eggCords[i][j + 1]);
 				}
 				glEnd();
@@ -190,14 +202,18 @@ void drawEgg() {
 			for (int j = 0; j < numberOfPoints; j++) {
 				k = numberOfPoints / 2 + 1;
 				glBegin(GL_TRIANGLES);
+				glNormal3fv(eggCords[i][0]);
 				glVertex3fv(eggCords[i][0]);
 
+				glNormal3fv(eggCords[k][j]);
 				glVertex3fv(eggCords[k][j]);
 
 				if (j + 1 == numberOfPoints) {
+					glNormal3fv(eggCords[k-2][0]);
 					glVertex3fv(eggCords[k-2][0]);
 				}
 				else {
+					glNormal3fv(eggCords[k][j + 1]);
 					glVertex3fv(eggCords[k][j + 1]);
 				}
 				glEnd();
@@ -206,10 +222,13 @@ void drawEgg() {
 			for (int j = 0; j < numberOfPoints - 1; j++) {
 				k = i + 1;
 				glBegin(GL_TRIANGLES);
+				glNormal3fv(eggCords[i][j]);
 				glVertex3fv(eggCords[i][j]);
 
+				glNormal3fv(eggCords[k][numberOfPoints - 1 - j]);
 				glVertex3fv(eggCords[k][numberOfPoints - 1 - j]);
 
+				glNormal3fv(eggCords[i][j + 1]);
 				glVertex3fv(eggCords[i][j + 1]);
 				glEnd();
 			}
@@ -217,10 +236,13 @@ void drawEgg() {
 			for (int j = 0; j < numberOfPoints - 1; j++) {
 				k = i - 1;
 				glBegin(GL_TRIANGLES);
+				glNormal3fv(eggCords[i][j]);
 				glVertex3fv(eggCords[i][j]);
 
+				glNormal3fv(eggCords[k][numberOfPoints - 1 - j]);
 				glVertex3fv(eggCords[k][numberOfPoints - 1 - j]);
 
+				glNormal3fv(eggCords[i][j + 1]);
 				glVertex3fv(eggCords[i][j + 1]);
 				glEnd();
 			}
@@ -238,18 +260,24 @@ void drawEgg() {
 				}
 
 				glBegin(GL_TRIANGLES);
+				glNormal3fv(eggCords[i][j]);
 				glVertex3fv(eggCords[i][j]);
 
+				glNormal3fv(eggCords[k][j]);
 				glVertex3fv(eggCords[k][j]);
 
+				glNormal3fv(eggCords[o][n]);
 				glVertex3fv(eggCords[o][n]);
 				glEnd();
 
 				glBegin(GL_TRIANGLES);
+				glNormal3fv(eggCords[m][n]);
 				glVertex3fv(eggCords[m][n]);
 
+				glNormal3fv(eggCords[k][j]);
 				glVertex3fv(eggCords[k][j]);
 
+				glNormal3fv(eggCords[o][n]);
 				glVertex3fv(eggCords[o][n]);
 				glEnd();
 			}
@@ -369,15 +397,15 @@ void MyInit(void) {
 	// położenie źródła
 
 
-	GLfloat light_ambient[] = {0.1, 0.1, 0, 1.0};
+	GLfloat light_ambient[] = {0.1, 0.1, 0.1, 1.0};
 	// składowe intensywności świecenia źródła światła otoczenia
 	// Ia = [Iar,Iag,Iab]
 
-	GLfloat light_diffuse[] = {1.0, 1.0, 0, 1.0};
+	GLfloat light_diffuse[] = {1.0, 1.0, 1.0, 1.0};
 	// składowe intensywności świecenia źródła światła powodującego
 	// odbicie dyfuzyjne Id = [Idr,Idg,Idb]
 
-	GLfloat light_specular[]= {1.0, 1.0, 0, 1.0};
+	GLfloat light_specular[]= {1.0, 1.0, 1.0, 1.0};
 	// składowe intensywności świecenia źródła światła powodującego
 	// odbicie kierunkowe Is = [Isr,Isg,Isb]
 
@@ -471,6 +499,7 @@ int main(int argc, char* argv[]) {
 	srand(time(0)); // ziarno dla liczb pseudo losowych
 
 	countEggCords(); // pojedyncze wywolanie wyliczen wierzcholkow jajka
+	countVectors();
 
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB |GLUT_DEPTH);
 
