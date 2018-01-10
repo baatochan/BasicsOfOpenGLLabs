@@ -21,8 +21,11 @@ using namespace std;
 void drawTriangle() {
 	glBegin(GL_TRIANGLES);
 	glColor3f(1.0f, 1.0f, 1.0f);
+	glTexCoord2f(0.0f, 0.0f);
 	glVertex3f(0,5,0);
+	glTexCoord2f(1.0f, 0.0f);
 	glVertex3f(5,-2.5,0);
+	glTexCoord2f(0.5f, 1.0f);
 	glVertex3f(-5,-2.5,0);
 	glEnd();
 }
@@ -102,104 +105,6 @@ void spinEgg() {
 
 /*************************************************************************************/
 
-// Funkcja ustalająca stan renderowania
-void MyInit(void) {
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-// Kolor czyszcący (wypełnienia okna) ustawiono na czarny
-
-	/*************************************************************************************/
-
-//  Definicja materiału z jakiego zrobione jest jajko
-//  i definicja źródła światła
-
-/*************************************************************************************/
-
-
-/*************************************************************************************/
-// Definicja materiału z jakiego zrobione jest jajko
-
-	GLfloat mat_ambient[]  = {1.0, 1.0, 1.0, 1.0};
-	// współczynniki ka =[kar,kag,kab] dla światła otoczenia
-
-	GLfloat mat_diffuse[]  = {1.0, 1.0, 1.0, 1.0};
-	// współczynniki kd =[kdr,kdg,kdb] światła rozproszonego
-
-	GLfloat mat_specular[] = {1.0, 1.0, 1.0, 1.0};
-	// współczynniki ks =[ksr,ksg,ksb] dla światła odbitego
-
-	GLfloat mat_shininess  = {20.0};
-	// współczynnik n opisujący połysk powierzchni
-
-
-/*************************************************************************************/
-// Definicja źródła światła
-
-
-	GLfloat light_position[] = {0, 5, 20.0, 1.0};
-	// położenie źródła
-
-
-	GLfloat light_ambient[] = {0.1, 0.1, 0.1, 1.0};
-	// składowe intensywności świecenia źródła światła otoczenia
-	// Ia = [Iar,Iag,Iab]
-
-	GLfloat light_diffuse[] = {1.0, 1.0, 1.0, 1.0};
-	// składowe intensywności świecenia źródła światła powodującego
-	// odbicie dyfuzyjne Id = [Idr,Idg,Idb]
-
-	GLfloat light_specular[]= {1.0, 1.0, 1.0, 1.0};
-	// składowe intensywności świecenia źródła światła powodującego
-	// odbicie kierunkowe Is = [Isr,Isg,Isb]
-
-	GLfloat att_constant  = {1.0};
-	// składowa stała ds dla modelu zmian oświetlenia w funkcji
-	// odległości od źródła
-
-	GLfloat att_linear    = {0.05};
-	// składowa liniowa dl dla modelu zmian oświetlenia w funkcji
-	// odległości od źródła
-
-	GLfloat att_quadratic  = {0.001};
-	// składowa kwadratowa dq dla modelu zmian oświetlenia w funkcji
-	// odległości od źródła
-
-/*************************************************************************************/
-// Ustawienie parametrów materiału i źródła światła
-
-/*************************************************************************************/
-// Ustawienie patrametrów materiału
-
-
-	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-	glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
-	glMaterialf(GL_FRONT, GL_SHININESS, mat_shininess);
-
-
-/*************************************************************************************/
-// Ustawienie parametrów źródła
-
-	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-
-	glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, att_constant);
-	glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, att_linear);
-	glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, att_quadratic);
-
-
-/*************************************************************************************/
-// Ustawienie opcji systemu oświetlania sceny
-
-	glShadeModel(GL_SMOOTH); // właczenie łagodnego cieniowania
-	glEnable(GL_LIGHTING);   // właczenie systemu oświetlenia sceny
-	glEnable(GL_LIGHT0);     // włączenie źródła o numerze 0
-	glEnable(GL_DEPTH_TEST); // włączenie mechanizmu z-bufora
-
-/*************************************************************************************/
-}
-
 /*************************************************************************************/
 // Funkcja wczytuje dane obrazu zapisanego w formacie TGA w pliku o nazwie
 // FileName, alokuje pamięć i zwraca wskaźnik (pBits) do bufora w którym
@@ -211,8 +116,6 @@ void MyInit(void) {
 // Działa tylko dla obrazów wykorzystujących 8, 24, or 32 bitowy kolor.
 // Nie obsługuje plików w formacie TGA kodowanych z kompresją RLE.
 /*************************************************************************************/
-
-
 GLbyte *LoadTGAImage(const char *FileName, GLint *ImWidth, GLint *ImHeight, GLint *ImComponents, GLenum *ImFormat)
 {
 
@@ -352,6 +255,171 @@ GLbyte *LoadTGAImage(const char *FileName, GLint *ImWidth, GLint *ImHeight, GLin
 }
 
 /*************************************************************************************/
+
+/*************************************************************************************/
+// Funkcja ustalająca stan renderowania
+/*************************************************************************************/
+void MyInit(void)
+{
+
+/*************************************************************************************/
+
+// Zmienne dla obrazu tekstury
+
+
+
+	GLbyte *pBytes;
+	GLint ImWidth, ImHeight, ImComponents;
+	GLenum ImFormat;
+
+	/*************************************************************************************/
+
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+// Kolor czyszcący (wypełnienia okna) ustawiono na czarny
+
+	/*************************************************************************************/
+
+//  Definicja materiału z jakiego zrobione jest jajko
+//  i definicja źródła światła
+
+/*************************************************************************************/
+
+
+/*************************************************************************************/
+// Definicja materiału z jakiego zrobione jest jajko
+
+	GLfloat mat_ambient[]  = {1.0, 1.0, 1.0, 1.0};
+	// współczynniki ka =[kar,kag,kab] dla światła otoczenia
+
+	GLfloat mat_diffuse[]  = {1.0, 1.0, 1.0, 1.0};
+	// współczynniki kd =[kdr,kdg,kdb] światła rozproszonego
+
+	GLfloat mat_specular[] = {1.0, 1.0, 1.0, 1.0};
+	// współczynniki ks =[ksr,ksg,ksb] dla światła odbitego
+
+	GLfloat mat_shininess  = {20.0};
+	// współczynnik n opisujący połysk powierzchni
+
+
+/*************************************************************************************/
+// Definicja źródła światła
+
+
+	GLfloat light_position[] = {0, 5, 20.0, 1.0};
+	// położenie źródła
+
+
+	GLfloat light_ambient[] = {0.1, 0.1, 0.1, 1.0};
+	// składowe intensywności świecenia źródła światła otoczenia
+	// Ia = [Iar,Iag,Iab]
+
+	GLfloat light_diffuse[] = {1.0, 1.0, 1.0, 1.0};
+	// składowe intensywności świecenia źródła światła powodującego
+	// odbicie dyfuzyjne Id = [Idr,Idg,Idb]
+
+	GLfloat light_specular[]= {1.0, 1.0, 1.0, 1.0};
+	// składowe intensywności świecenia źródła światła powodującego
+	// odbicie kierunkowe Is = [Isr,Isg,Isb]
+
+	GLfloat att_constant  = {1.0};
+	// składowa stała ds dla modelu zmian oświetlenia w funkcji
+	// odległości od źródła
+
+	GLfloat att_linear    = {0.05};
+	// składowa liniowa dl dla modelu zmian oświetlenia w funkcji
+	// odległości od źródła
+
+	GLfloat att_quadratic  = {0.001};
+	// składowa kwadratowa dq dla modelu zmian oświetlenia w funkcji
+	// odległości od źródła
+
+/*************************************************************************************/
+// Ustawienie parametrów materiału i źródła światła
+
+/*************************************************************************************/
+// Ustawienie patrametrów materiału
+
+
+	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+	glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+	glMaterialf(GL_FRONT, GL_SHININESS, mat_shininess);
+
+
+/*************************************************************************************/
+// Ustawienie parametrów źródła
+
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+	glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, att_constant);
+	glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, att_linear);
+	glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, att_quadratic);
+
+
+/*************************************************************************************/
+// Ustawienie opcji systemu oświetlania sceny
+
+	glShadeModel(GL_SMOOTH); // właczenie łagodnego cieniowania
+	glEnable(GL_LIGHTING);   // właczenie systemu oświetlenia sceny
+	glEnable(GL_LIGHT0);     // włączenie źródła o numerze 0
+	glEnable(GL_DEPTH_TEST); // włączenie mechanizmu z-bufora
+
+/*************************************************************************************/
+/*************************************************************************************/
+
+// Teksturowanie będzie prowadzone tyko po jednej stronie ściany
+
+	glEnable(GL_CULL_FACE);
+
+
+/*************************************************************************************/
+
+//  Przeczytanie obrazu tekstury z pliku o nazwie tekstura.tga
+
+	pBytes = LoadTGAImage("../../tekstury/D5_t.tga", &ImWidth, &ImHeight, &ImComponents, &ImFormat);
+
+	if (pBytes == nullptr) {
+		cout<<"Failed to load texture file!";
+	}
+
+	/*************************************************************************************/
+
+// Zdefiniowanie tekstury 2-D
+
+	glTexImage2D(GL_TEXTURE_2D, 0, ImComponents, ImWidth, ImHeight, 0, ImFormat, GL_UNSIGNED_BYTE, pBytes);
+
+/*************************************************************************************/
+
+// Zwolnienie pamięci
+
+	free(pBytes);
+
+
+/*************************************************************************************/
+
+// Włączenie mechanizmu teksturowania
+
+	glEnable(GL_TEXTURE_2D);
+
+/*************************************************************************************/
+
+// Ustalenie trybu teksturowania
+
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+/*************************************************************************************/
+
+// Określenie sposobu nakładania tekstur
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glCullFace(GL_FRONT);
+}
+
 /*************************************************************************************/
 
 // Funkcja ma za zadanie utrzymanie stałych proporcji rysowanych
