@@ -16,7 +16,12 @@ typedef float point3[3];
 
 static GLfloat theta[] = {0, 0, 0}; // trzy kąty obrotu
 
-int model = 1; //ktore sciany maja byc rysowane
+int drawWall0 = 1;
+int drawWall1 = 1;
+int drawWall2 = 1;
+int drawWall3 = 1;
+
+int spinModel = 4;
 
 using namespace std;
 
@@ -26,45 +31,53 @@ void drawTetrahedron() {
 
 	glColor3f(1,1,1);
 
-	glTexCoord2f(0.0f, 1.0f);
-	glNormal3f(0.0f, -1.0f, 0.0f);
-	glVertex3f(-4.5f, -2.1666f, -2.1666f);
-	glTexCoord2f(1.0f, 1.0f);
-	glNormal3f(0.0f, -1.0f, 0.0f);
-	glVertex3f(4.5f, -2.1666f, -2.1666f);
-	glTexCoord2f(0.5f, 0.0f);
-	glNormal3f(0.0f, -1.0f, 0.0f);
-	glVertex3f(0.0f, -2.1666f, 4.3334f);
+	if (drawWall0 == 1) {
+		glTexCoord2f(0.0f, 1.0f);
+		glNormal3f(0.0f, -1.0f, 0.0f);
+		glVertex3f(-4.5f, -2.1666f, -2.1666f);
+		glTexCoord2f(1.0f, 1.0f);
+		glNormal3f(0.0f, -1.0f, 0.0f);
+		glVertex3f(4.5f, -2.1666f, -2.1666f);
+		glTexCoord2f(0.5f, 0.0f);
+		glNormal3f(0.0f, -1.0f, 0.0f);
+		glVertex3f(0.0f, -2.1666f, 4.3334f);
+	}
 
-	glTexCoord2f(0.0f, 1.0f);
-	glNormal3f(-4.5f, 2.1666f, 2.1666f);
-	glVertex3f(-4.5f, -2.1666f, -2.1666f);
-	glTexCoord2f(1.0f, 1.0f);
-	glNormal3f(-4.5f, 2.1666f, 2.1666f);
-	glVertex3f(0.0f, -2.1666f, 4.3334f);
-	glTexCoord2f(0.5f, 0.0f);
-	glNormal3f(-4.5f, 2.1666f, 2.1666f);
-	glVertex3f(0.0f, 4.3334f, 0.0f);
+	if (drawWall1 == 1) {
+		glTexCoord2f(0.0f, 1.0f);
+		glNormal3f(-4.5f, 2.1666f, 2.1666f);
+		glVertex3f(-4.5f, -2.1666f, -2.1666f);
+		glTexCoord2f(1.0f, 1.0f);
+		glNormal3f(-4.5f, 2.1666f, 2.1666f);
+		glVertex3f(0.0f, -2.1666f, 4.3334f);
+		glTexCoord2f(0.5f, 0.0f);
+		glNormal3f(-4.5f, 2.1666f, 2.1666f);
+		glVertex3f(0.0f, 4.3334f, 0.0f);
+	}
 
-	glTexCoord2f(0.0f, 1.0f);
-	glNormal3f(4.5f, 2.1666f, 2.1666f);
-	glVertex3f(0.0f, -2.1666f, 4.3334f);
-	glTexCoord2f(1.0f, 1.0f);
-	glNormal3f(4.5f, 2.1666f, 2.1666f);
-	glVertex3f(4.5f, -2.1666f, -2.1666f);
-	glTexCoord2f(0.5f, 0.0f);
-	glNormal3f(4.5f, 2.1666f, 2.1666f);
-	glVertex3f(0.0f, 4.3334f, 0.0f);
+	if (drawWall2 == 1) {
+		glTexCoord2f(0.0f, 1.0f);
+		glNormal3f(4.5f, 2.1666f, 2.1666f);
+		glVertex3f(0.0f, -2.1666f, 4.3334f);
+		glTexCoord2f(1.0f, 1.0f);
+		glNormal3f(4.5f, 2.1666f, 2.1666f);
+		glVertex3f(4.5f, -2.1666f, -2.1666f);
+		glTexCoord2f(0.5f, 0.0f);
+		glNormal3f(4.5f, 2.1666f, 2.1666f);
+		glVertex3f(0.0f, 4.3334f, 0.0f);
+	}
 
-	glTexCoord2f(0.0f, 1.0f);
-	glNormal3f(0.0f, 2.1666f, -4.3334f);
-	glVertex3f(4.5f, -2.1666f, -2.1666f);
-	glTexCoord2f(1.0f, 1.0f);
-	glNormal3f(0.0f, 2.1666f, -4.3334f);
-	glVertex3f(-4.5f, -2.1666f, -2.1666f);
-	glTexCoord2f(0.5f, 0.0f);
-	glNormal3f(0.0f, 2.1666f, -4.3334f);
-	glVertex3f(0.0f, 4.3334f, 0.0f);
+	if (drawWall3 == 1) {
+		glTexCoord2f(0.0f, 1.0f);
+		glNormal3f(0.0f, 2.1666f, -4.3334f);
+		glVertex3f(4.5f, -2.1666f, -2.1666f);
+		glTexCoord2f(1.0f, 1.0f);
+		glNormal3f(0.0f, 2.1666f, -4.3334f);
+		glVertex3f(-4.5f, -2.1666f, -2.1666f);
+		glTexCoord2f(0.5f, 0.0f);
+		glNormal3f(0.0f, 2.1666f, -4.3334f);
+		glVertex3f(0.0f, 4.3334f, 0.0f);
+	}
 
 	glEnd();
 }
@@ -130,14 +143,32 @@ void RenderScene() {
 
 // funkcja definiujaca obracanie bryly
 void spinEgg() {
-	//theta[0] -= 0.05;
+	if (spinModel == 1) {
+		theta[0] -= 0.05;
+		theta[1] = 0;
+		theta[2] = 0;
+	}
 	if( theta[0] > 360.0 ) theta[0] -= 360.0;
 
-	//theta[1] -= 0.05;
+	if (spinModel == 2) {
+		theta[0] = 0;
+		theta[1] -= 0.05;
+		theta[2] = 0;
+	}
 	if( theta[1] > 360.0 ) theta[1] -= 360.0;
 
-	//theta[2] -= 0.05;
+	if (spinModel == 3) {
+		theta[0] = 0;
+		theta[1] = 0;
+		theta[2] -= 0.05;
+	}
 	if( theta[2] > 360.0 ) theta[2] -= 360.0;
+
+	if (spinModel == 4) {
+		theta[0] = 0;
+		theta[1] = 0;
+		theta[2] = 0;
+	}
 
 	glutPostRedisplay(); //odświeżenie zawartości aktualnego okna
 }
@@ -499,11 +530,27 @@ void ChangeSize(GLsizei horizontal, GLsizei vertical ) {
 // funckja reakcji na klawiature - zmiana modelu rysowanego w zaleznosci od klawisza
 void keys(unsigned char key, int x, int y)
 {
-	if(key == '1') model = 1;
-	if(key == '2') model = 2;
-	if(key == '3') model = 3;
-	if(key == '4') model = 4;
-	if(key == '5') model = 5;
+	if(key == '1') {
+		if (drawWall0 == 0) drawWall0 = 1;
+		else drawWall0 = 0;
+	}
+	if(key == '2') {
+		if (drawWall1 == 0) drawWall1 = 1;
+		else drawWall1 = 0;
+	}
+	if(key == '3') {
+		if (drawWall2 == 0) drawWall2 = 1;
+		else drawWall2 = 0;
+	}
+	if(key == '4') {
+		if (drawWall3 == 0) drawWall3 = 1;
+		else drawWall3 = 0;
+	}
+
+	if(key == 'z') spinModel = 1;
+	if(key == 'x') spinModel = 2;
+	if(key == 'c') spinModel = 3;
+	if(key == 'v') spinModel = 4;
 
 	RenderScene(); // przerysowanie obrazu sceny
 }
@@ -535,6 +582,8 @@ int main(int argc, char* argv[]) {
 // inicjalizacje konieczne  przed przystąpieniem do renderowania
 	glEnable(GL_DEPTH_TEST);
 // Włączenie mechanizmu usuwania powierzchni niewidocznych
+
+	glutKeyboardFunc(keys); //zdefiniowanie funkcji reakcji na klawiature
 
 	glutMainLoop();
 // Funkcja uruchamia szkielet biblioteki GLUT
