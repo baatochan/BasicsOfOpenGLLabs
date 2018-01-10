@@ -16,17 +16,56 @@ typedef float point3[3];
 
 static GLfloat theta[] = {0, 0, 0}; // trzy kąty obrotu
 
+int model = 1; //ktore sciany maja byc rysowane
+
 using namespace std;
 
-void drawTriangle() {
+
+void drawTetrahedron() {
 	glBegin(GL_TRIANGLES);
-	glColor3f(1.0f, 1.0f, 1.0f);
-	glTexCoord2f(0.0f, 0.0f);
-	glVertex3f(0,5,0);
-	glTexCoord2f(0.5f, 1.0f);
-	glVertex3f(-5,-2.5,0);
-	glTexCoord2f(1.0f, 0.0f);
-	glVertex3f(5,-2.5,0);
+
+	glColor3f(1,1,1);
+
+	glTexCoord2f(0.0f, 1.0f);
+	glNormal3f(0.0f, -1.0f, 0.0f);
+	glVertex3f(-4.5f, -2.1666f, -2.1666f);
+	glTexCoord2f(1.0f, 1.0f);
+	glNormal3f(0.0f, -1.0f, 0.0f);
+	glVertex3f(4.5f, -2.1666f, -2.1666f);
+	glTexCoord2f(0.5f, 0.0f);
+	glNormal3f(0.0f, -1.0f, 0.0f);
+	glVertex3f(0.0f, -2.1666f, 4.3334f);
+
+	glTexCoord2f(0.0f, 1.0f);
+	glNormal3f(-4.5f, 2.1666f, 2.1666f);
+	glVertex3f(-4.5f, -2.1666f, -2.1666f);
+	glTexCoord2f(1.0f, 1.0f);
+	glNormal3f(-4.5f, 2.1666f, 2.1666f);
+	glVertex3f(0.0f, -2.1666f, 4.3334f);
+	glTexCoord2f(0.5f, 0.0f);
+	glNormal3f(-4.5f, 2.1666f, 2.1666f);
+	glVertex3f(0.0f, 4.3334f, 0.0f);
+
+	glTexCoord2f(0.0f, 1.0f);
+	glNormal3f(4.5f, 2.1666f, 2.1666f);
+	glVertex3f(0.0f, -2.1666f, 4.3334f);
+	glTexCoord2f(1.0f, 1.0f);
+	glNormal3f(4.5f, 2.1666f, 2.1666f);
+	glVertex3f(4.5f, -2.1666f, -2.1666f);
+	glTexCoord2f(0.5f, 0.0f);
+	glNormal3f(4.5f, 2.1666f, 2.1666f);
+	glVertex3f(0.0f, 4.3334f, 0.0f);
+
+	glTexCoord2f(0.0f, 1.0f);
+	glNormal3f(0.0f, 2.1666f, -4.3334f);
+	glVertex3f(4.5f, -2.1666f, -2.1666f);
+	glTexCoord2f(1.0f, 1.0f);
+	glNormal3f(0.0f, 2.1666f, -4.3334f);
+	glVertex3f(-4.5f, -2.1666f, -2.1666f);
+	glTexCoord2f(0.5f, 0.0f);
+	glNormal3f(0.0f, 2.1666f, -4.3334f);
+	glVertex3f(0.0f, 4.3334f, 0.0f);
+
 	glEnd();
 }
 
@@ -71,7 +110,7 @@ void RenderScene() {
 
 	glLoadIdentity();
 // Czyszczenie macierzy bieżącej
-	Axes();
+	//Axes();
 // Narysowanie osi przy pomocy funkcji zdefiniowanej wyżej
 
 	glRotatef(theta[0], 1.0, 0.0, 0.0);
@@ -80,7 +119,7 @@ void RenderScene() {
 
 	glRotatef(theta[2], 0.0, 0.0, 1.0);
 
-	drawTriangle(); // wywolanie funkcji rysujacej jajko
+	drawTetrahedron(); // wywolanie funkcji rysujacej jajko
 
 	glFlush();
 // Przekazanie poleceń rysujących do wykonania
@@ -91,13 +130,13 @@ void RenderScene() {
 
 // funkcja definiujaca obracanie bryly
 void spinEgg() {
-	theta[0] -= 0.05;
+	//theta[0] -= 0.05;
 	if( theta[0] > 360.0 ) theta[0] -= 360.0;
 
-	theta[1] -= 0.05;
+	//theta[1] -= 0.05;
 	if( theta[1] > 360.0 ) theta[1] -= 360.0;
 
-	theta[2] -= 0.05;
+	//theta[2] -= 0.05;
 	if( theta[2] > 360.0 ) theta[2] -= 360.0;
 
 	glutPostRedisplay(); //odświeżenie zawartości aktualnego okna
@@ -379,7 +418,7 @@ void MyInit(void)
 
 //  Przeczytanie obrazu tekstury z pliku o nazwie tekstura.tga
 
-	pBytes = LoadTGAImage("../../tekstury/D5_t.tga", &ImWidth, &ImHeight, &ImComponents, &ImFormat);
+	pBytes = LoadTGAImage("../../tekstury/D3_t.tga", &ImWidth, &ImHeight, &ImComponents, &ImFormat);
 
 	if (pBytes == nullptr) {
 		cout<<"Failed to load texture file!";
@@ -456,6 +495,18 @@ void ChangeSize(GLsizei horizontal, GLsizei vertical ) {
 // Czyszcenie macierzy bieżącej
 }
 /*************************************************************************************/
+
+// funckja reakcji na klawiature - zmiana modelu rysowanego w zaleznosci od klawisza
+void keys(unsigned char key, int x, int y)
+{
+	if(key == '1') model = 1;
+	if(key == '2') model = 2;
+	if(key == '3') model = 3;
+	if(key == '4') model = 4;
+	if(key == '5') model = 5;
+
+	RenderScene(); // przerysowanie obrazu sceny
+}
 
 // Główny punkt wejścia programu. Program działa w trybie konsoli
 int main(int argc, char* argv[]) {
