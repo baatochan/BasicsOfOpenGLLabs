@@ -9,77 +9,318 @@
 #include <cmath>
 #include <ctime> //dla time
 
-#define numberOfPoints 20 // poziom szczegolowosci rysunku - im wiecej tym wiecej punktow w jajku
+#define numberOfPoints 20 // poziom szczegolowosci rysunku - im wiecej tym wiecej punktow w jajku TODO: naprawic dzialanie dla nieparzystych
 
 typedef float point3[3];
 /*************************************************************************************/
 
 static GLfloat theta[] = {0, 0, 0}; // trzy kąty obrotu
 
-int drawWall0 = 1;
-int drawWall1 = 1;
-int drawWall2 = 1;
-int drawWall3 = 1;
+point3 eggCords[numberOfPoints][numberOfPoints]; // tablica zawierajaca wspolrzedne punktow jajka
+point3 normalVector[numberOfPoints][numberOfPoints];
 
 int spinModel = 4;
 
 using namespace std;
 
+/**
+ * Funkcja wyliczajaca wspolrzedne jajka w zaleznosci od szczegolowosci (numberOfPoints)
+ */
+void countEggCords() {
+	float vmin = 0;
+	float vmax = 1;
+	float umin = 0;
+	float umax = 1;
 
-void drawTetrahedron() {
-	glBegin(GL_TRIANGLES);
+	float v, u, x, y, z;
 
+	float vSpace = (vmax-vmin)/numberOfPoints; //TODO: nazwac to jakos
+	float uSpace = (umax-umin)/numberOfPoints; //TODO: nazwac to jakos
+
+	for (int i = 0; i < numberOfPoints; i++) {
+		for (int j = 0; j < numberOfPoints; j++) {
+			v = vmin + i*vSpace;
+			u = umin + j*uSpace;
+
+			x = -90 * pow(u, 5);
+			x += 225 * pow(u, 4);
+			x -= 270 * pow(u, 3);
+			x += 180 * pow(u, 2);
+			x -= 45 * u;
+			z = x;
+			x *= cos(M_PI * v);
+
+			y = 160 * pow(u, 4);
+			y -= 320 * pow(u, 3);
+			y += 160 * pow(u, 2);
+			y -= 5;
+
+			z *= sin(M_PI * v);
+
+			eggCords[j][i][0] = x;
+			eggCords[j][i][1] = y;
+			eggCords[j][i][2] = z;
+		}
+	}
+}
+
+/**
+ * Funkcja wyliczajaca wektory normalne dla kazdego punktu
+ */
+void countVectors() {
+	float vmin = 0;
+	float vmax = 1;
+	float umin = 0;
+	float umax = 1;
+
+	float v, u, xu, yu, zu, xv, yv, zv, vectorLength;
+
+	float vSpace = (vmax-vmin)/numberOfPoints; //TODO: nazwac to jakos
+	float uSpace = (umax-umin)/numberOfPoints; //TODO: nazwac to jakos
+	for (int i = 0; i < numberOfPoints; i++) {
+		for (int j = 0; j < numberOfPoints; j++) {
+			v = vmin + i*vSpace;
+			u = umin + j*uSpace;
+
+			xu = -450 * pow(u, 4);
+			xu += 900 * pow(u, 3);
+			xu -= 810 * pow (u, 2);
+			xu += 360 * u;
+			xu -= 45;
+			xu *= cos(M_PI * v);
+
+			xv = 90 * pow(u, 5);
+			xv -= 225 * pow(u, 4);
+			xv += 270 * pow(u, 3);
+			xv -= 180 * pow(u, 2);
+			xv += 45 * u;
+			xv *= M_PI;
+			xv *= sin(M_PI * v);
+
+			yu = 640 * pow(u, 3);
+			yu -= 960 * pow(u, 2);
+			yu += 320 * u;
+
+			yv = 0;
+
+			zu = -450 * pow(u, 4);
+			zu += 900 * pow(u, 3);
+			zu -= 810 * pow (u, 2);
+			zu += 360 * u;
+			zu -= 45;
+			zu *= sin(M_PI * v);
+
+			zv = 90 * pow(u, 5);
+			zv -= 225 * pow(u, 4);
+			zv += 270 * pow(u, 3);
+			zv -= 180 * pow(u, 2);
+			zv += 45 * u;
+			zv *= -1 * M_PI;
+			zv *= cos(M_PI * v);
+
+			vectorLength = pow((yu*zv) - (zu*yv), 2);
+			vectorLength += pow((zu*xv) - (xu*zv), 2);
+			vectorLength += pow((xu*yv) - (yu*xv), 2);
+			vectorLength = sqrt(vectorLength);
+
+			normalVector[i][j][0] = ((yu*zv) - (zu*yv)) / vectorLength;
+			normalVector[i][j][1] = ((zu*xv) - (xu*zv)) / vectorLength;
+			normalVector[i][j][2] = ((xu*yv) - (yu*xv)) / vectorLength;
+		}
+	}
+}
+
+/**
+ * Funkcja rysujaca jajko.
+ */
+void drawEgg() {
 	glColor3f(1,1,1);
+	int k = 0;
+	int l = 0;
+	int m = 0;
+	int n = 0;
+	int o = 0;
+	for (int i = 0; i < numberOfPoints; i++) {
+		if (i == 0) {
+			for (int j = 0; j < numberOfPoints; j++) {
+				k = 1;
+				glBegin(GL_TRIANGLES);
+				glNormal3fv(eggCords[0][0]);
+				glVertex3fv(eggCords[0][0]);
 
-	if (drawWall0 == 1) {
-		glTexCoord2f(0.0f, 1.0f);
-		glNormal3f(0.0f, -1.0f, 0.0f);
-		glVertex3f(-4.5f, -2.1666f, -2.1666f);
-		glTexCoord2f(1.0f, 1.0f);
-		glNormal3f(0.0f, -1.0f, 0.0f);
-		glVertex3f(4.5f, -2.1666f, -2.1666f);
-		glTexCoord2f(0.5f, 0.0f);
-		glNormal3f(0.0f, -1.0f, 0.0f);
-		glVertex3f(0.0f, -2.1666f, 4.3334f);
+				if (j + 1 == numberOfPoints) {
+					glNormal3fv(eggCords[numberOfPoints-1][0]);
+					glVertex3fv(eggCords[numberOfPoints-1][0]);
+				}
+				else {
+					glNormal3fv(eggCords[k][j + 1]);
+					glVertex3fv(eggCords[k][j + 1]);
+				}
+
+				glNormal3fv(eggCords[k][j]);
+				glVertex3fv(eggCords[k][j]);
+				glEnd();
+			}
+		} else if (i == numberOfPoints - 1) {
+			for (int j = 0; j < numberOfPoints; j++) {
+				k = 1;
+				glBegin(GL_TRIANGLES);
+				glNormal3fv(eggCords[0][0]);
+				glVertex3fv(eggCords[0][0]);
+
+				if (j + 1 == numberOfPoints) {
+					glNormal3fv(eggCords[1][0]);
+					glVertex3fv(eggCords[1][0]);
+				}
+				else {
+					glNormal3fv(eggCords[i][j + 1]);
+					glVertex3fv(eggCords[i][j + 1]);
+				}
+
+				glNormal3fv(eggCords[i][j]);
+				glVertex3fv(eggCords[i][j]);
+				glEnd();
+			}
+		} else if (i == (numberOfPoints / 2) - 1 && numberOfPoints % 2 == 0) {
+			for (int j = 0; j < numberOfPoints; j++) {
+				k = numberOfPoints / 2;
+				glBegin(GL_TRIANGLES);
+				glNormal3fv(eggCords[k][0]);
+				glVertex3fv(eggCords[k][0]);
+
+				glNormal3fv(eggCords[i][j]);
+				glVertex3fv(eggCords[i][j]);
+
+				if (j + 1 == numberOfPoints) {
+					glNormal3fv(eggCords[k+1][0]);
+					glVertex3fv(eggCords[k+1][0]);
+				}
+				else {
+					glNormal3fv(eggCords[i][j + 1]);
+					glVertex3fv(eggCords[i][j + 1]);
+				}
+				glEnd();
+			}
+		} else if (i == numberOfPoints / 2 && numberOfPoints % 2 == 0) {
+			for (int j = 0; j < numberOfPoints; j++) {
+				k = numberOfPoints / 2 + 1;
+				glBegin(GL_TRIANGLES);
+				glNormal3fv(eggCords[i][0]);
+				glVertex3fv(eggCords[i][0]);
+
+				glNormal3fv(eggCords[k][j]);
+				glVertex3fv(eggCords[k][j]);
+
+				if (j + 1 == numberOfPoints) {
+					glNormal3fv(eggCords[k-2][0]);
+					glVertex3fv(eggCords[k-2][0]);
+				}
+				else {
+					glNormal3fv(eggCords[k][j + 1]);
+					glVertex3fv(eggCords[k][j + 1]);
+				}
+				glEnd();
+			}
+		} else if (numberOfPoints % 2 == 1 && i == (numberOfPoints - 1) / 2) {
+			for (int j = 0; j < numberOfPoints - 1; j++) {
+				k = i + 1;
+				glBegin(GL_TRIANGLES);
+				glNormal3fv(eggCords[i][j]);
+				glVertex3fv(eggCords[i][j]);
+
+				glNormal3fv(eggCords[i][j + 1]);
+				glVertex3fv(eggCords[i][j + 1]);
+
+				glNormal3fv(eggCords[k][numberOfPoints - 1 - j]);
+				glVertex3fv(eggCords[k][numberOfPoints - 1 - j]);
+				glEnd();
+			}
+		} else if (numberOfPoints % 2 == 1 && i == (numberOfPoints + 1) / 2) {
+			for (int j = 0; j < numberOfPoints - 1; j++) {
+				k = i - 1;
+				glBegin(GL_TRIANGLES);
+				glNormal3fv(eggCords[i][j]);
+				glVertex3fv(eggCords[i][j]);
+
+				glNormal3fv(eggCords[i][j + 1]);
+				glVertex3fv(eggCords[i][j + 1]);
+
+				glNormal3fv(eggCords[k][numberOfPoints - 1 - j]);
+				glVertex3fv(eggCords[k][numberOfPoints - 1 - j]);
+				glEnd();
+			}
+		} else if (i > numberOfPoints / 2) {
+			for (int j = 0; j < numberOfPoints; j++) {
+				k = i + 1;
+				l = j + 1;
+				m = i + 1;
+				n = j + 1;
+				o = i;
+				if (l == numberOfPoints) {
+					n = 0;
+					o = numberOfPoints - i;
+					m = numberOfPoints - i - 1;
+				}
+
+				glBegin(GL_TRIANGLES);
+				glNormal3fv(eggCords[i][j]);
+				glVertex3fv(eggCords[i][j]);
+
+				glNormal3fv(eggCords[k][j]);
+				glVertex3fv(eggCords[k][j]);
+
+				glNormal3fv(eggCords[o][n]);
+				glVertex3fv(eggCords[o][n]);
+				glEnd();
+
+				glBegin(GL_TRIANGLES);
+				glNormal3fv(eggCords[m][n]);
+				glVertex3fv(eggCords[m][n]);
+
+				glNormal3fv(eggCords[o][n]);
+				glVertex3fv(eggCords[o][n]);
+
+				glNormal3fv(eggCords[k][j]);
+				glVertex3fv(eggCords[k][j]);
+				glEnd();
+			}
+		} else {
+			for (int j = 0; j < numberOfPoints; j++) {
+				k = i + 1;
+				l = j + 1;
+				m = i + 1;
+				n = j + 1;
+				o = i;
+				if (l == numberOfPoints) {
+					n = 0;
+					o = numberOfPoints - i;
+					m = numberOfPoints - i - 1;
+				}
+
+				glBegin(GL_TRIANGLES);
+				glNormal3fv(eggCords[i][j]);
+				glVertex3fv(eggCords[i][j]);
+
+				glNormal3fv(eggCords[o][n]);
+				glVertex3fv(eggCords[o][n]);
+
+				glNormal3fv(eggCords[k][j]);
+				glVertex3fv(eggCords[k][j]);
+				glEnd();
+
+				glBegin(GL_TRIANGLES);
+				glNormal3fv(eggCords[m][n]);
+				glVertex3fv(eggCords[m][n]);
+
+				glNormal3fv(eggCords[k][j]);
+				glVertex3fv(eggCords[k][j]);
+
+				glNormal3fv(eggCords[o][n]);
+				glVertex3fv(eggCords[o][n]);
+				glEnd();
+			}
+		}
 	}
-
-	if (drawWall1 == 1) {
-		glTexCoord2f(0.0f, 1.0f);
-		glNormal3f(-4.5f, 2.1666f, 2.1666f);
-		glVertex3f(-4.5f, -2.1666f, -2.1666f);
-		glTexCoord2f(1.0f, 1.0f);
-		glNormal3f(-4.5f, 2.1666f, 2.1666f);
-		glVertex3f(0.0f, -2.1666f, 4.3334f);
-		glTexCoord2f(0.5f, 0.0f);
-		glNormal3f(-4.5f, 2.1666f, 2.1666f);
-		glVertex3f(0.0f, 4.3334f, 0.0f);
-	}
-
-	if (drawWall2 == 1) {
-		glTexCoord2f(0.0f, 1.0f);
-		glNormal3f(4.5f, 2.1666f, 2.1666f);
-		glVertex3f(0.0f, -2.1666f, 4.3334f);
-		glTexCoord2f(1.0f, 1.0f);
-		glNormal3f(4.5f, 2.1666f, 2.1666f);
-		glVertex3f(4.5f, -2.1666f, -2.1666f);
-		glTexCoord2f(0.5f, 0.0f);
-		glNormal3f(4.5f, 2.1666f, 2.1666f);
-		glVertex3f(0.0f, 4.3334f, 0.0f);
-	}
-
-	if (drawWall3 == 1) {
-		glTexCoord2f(0.0f, 1.0f);
-		glNormal3f(0.0f, 2.1666f, -4.3334f);
-		glVertex3f(4.5f, -2.1666f, -2.1666f);
-		glTexCoord2f(1.0f, 1.0f);
-		glNormal3f(0.0f, 2.1666f, -4.3334f);
-		glVertex3f(-4.5f, -2.1666f, -2.1666f);
-		glTexCoord2f(0.5f, 0.0f);
-		glNormal3f(0.0f, 2.1666f, -4.3334f);
-		glVertex3f(0.0f, 4.3334f, 0.0f);
-	}
-
-	glEnd();
 }
 
 // Funkcja rysująca osie układu współrzędnych
@@ -132,7 +373,7 @@ void RenderScene() {
 
 	glRotatef(theta[2], 0.0, 0.0, 1.0);
 
-	drawTetrahedron(); // wywolanie funkcji rysujacej jajko
+	drawEgg(); // wywolanie funkcji rysujacej jajko
 
 	glFlush();
 // Przekazanie poleceń rysujących do wykonania
@@ -375,7 +616,7 @@ void MyInit(void)
 // Definicja źródła światła
 
 
-	GLfloat light_position[] = {0, 5, 20.0, 1.0};
+	GLfloat light_position[] = {0, 5, -20.0, 1.0};
 	// położenie źródła
 
 
@@ -449,7 +690,7 @@ void MyInit(void)
 
 //  Przeczytanie obrazu tekstury z pliku o nazwie tekstura.tga
 
-	pBytes = LoadTGAImage("../../tekstury/D3_t.tga", &ImWidth, &ImHeight, &ImComponents, &ImFormat);
+	pBytes = LoadTGAImage("../../tekstury/D2_t.tga", &ImWidth, &ImHeight, &ImComponents, &ImFormat);
 
 	if (pBytes == nullptr) {
 		cout<<"Failed to load texture file!";
@@ -530,23 +771,6 @@ void ChangeSize(GLsizei horizontal, GLsizei vertical ) {
 // funckja reakcji na klawiature - zmiana modelu rysowanego w zaleznosci od klawisza
 void keys(unsigned char key, int x, int y)
 {
-	if(key == '1') {
-		if (drawWall0 == 0) drawWall0 = 1;
-		else drawWall0 = 0;
-	}
-	if(key == '2') {
-		if (drawWall1 == 0) drawWall1 = 1;
-		else drawWall1 = 0;
-	}
-	if(key == '3') {
-		if (drawWall2 == 0) drawWall2 = 1;
-		else drawWall2 = 0;
-	}
-	if(key == '4') {
-		if (drawWall3 == 0) drawWall3 = 1;
-		else drawWall3 = 0;
-	}
-
 	if(key == 'z') spinModel = 1;
 	if(key == 'x') spinModel = 2;
 	if(key == 'c') spinModel = 3;
@@ -558,6 +782,9 @@ void keys(unsigned char key, int x, int y)
 // Główny punkt wejścia programu. Program działa w trybie konsoli
 int main(int argc, char* argv[]) {
 	srand(time(0)); // ziarno dla liczb pseudo losowych
+
+	countEggCords(); // pojedyncze wywolanie wyliczen wierzcholkow jajka
+	countVectors();
 
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB |GLUT_DEPTH);
 
