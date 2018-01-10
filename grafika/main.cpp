@@ -221,34 +221,6 @@ void drawEgg() {
 				}
 				glEnd();
 			}
-		} else if (numberOfPoints % 2 == 1 && i == (numberOfPoints - 1) / 2) {
-			for (int j = 0; j < numberOfPoints - 1; j++) {
-				k = i + 1;
-				glBegin(GL_TRIANGLES);
-				glNormal3fv(eggCords[i][j]);
-				glVertex3fv(eggCords[i][j]);
-
-				glNormal3fv(eggCords[i][j + 1]);
-				glVertex3fv(eggCords[i][j + 1]);
-
-				glNormal3fv(eggCords[k][numberOfPoints - 1 - j]);
-				glVertex3fv(eggCords[k][numberOfPoints - 1 - j]);
-				glEnd();
-			}
-		} else if (numberOfPoints % 2 == 1 && i == (numberOfPoints + 1) / 2) {
-			for (int j = 0; j < numberOfPoints - 1; j++) {
-				k = i - 1;
-				glBegin(GL_TRIANGLES);
-				glNormal3fv(eggCords[i][j]);
-				glVertex3fv(eggCords[i][j]);
-
-				glNormal3fv(eggCords[i][j + 1]);
-				glVertex3fv(eggCords[i][j + 1]);
-
-				glNormal3fv(eggCords[k][numberOfPoints - 1 - j]);
-				glVertex3fv(eggCords[k][numberOfPoints - 1 - j]);
-				glEnd();
-			}
 		} else if (i > numberOfPoints / 2) {
 			for (int j = 0; j < numberOfPoints; j++) {
 				k = i + 1;
