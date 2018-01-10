@@ -23,10 +23,10 @@ void drawTriangle() {
 	glColor3f(1.0f, 1.0f, 1.0f);
 	glTexCoord2f(0.0f, 0.0f);
 	glVertex3f(0,5,0);
-	glTexCoord2f(1.0f, 0.0f);
-	glVertex3f(5,-2.5,0);
 	glTexCoord2f(0.5f, 1.0f);
 	glVertex3f(-5,-2.5,0);
+	glTexCoord2f(1.0f, 0.0f);
+	glVertex3f(5,-2.5,0);
 	glEnd();
 }
 
@@ -417,7 +417,7 @@ void MyInit(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	glCullFace(GL_FRONT);
+	//glCullFace(GL_FRONT);
 }
 
 /*************************************************************************************/
@@ -477,7 +477,7 @@ int main(int argc, char* argv[]) {
 // Dla aktualnego okna ustala funkcję zwrotną odpowiedzialną
 // zazmiany rozmiaru okna
 
-	//glutIdleFunc(spinEgg); //zdefiniowanie funckji obrotu jajka
+	glutIdleFunc(spinEgg); //zdefiniowanie funckji obrotu jajka
 
 	MyInit();
 // Funkcja MyInit() (zdefiniowana powyżej) wykonuje wszelkie
