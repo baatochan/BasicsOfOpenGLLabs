@@ -9,15 +9,17 @@
 #include <cmath>
 #include <ctime> //dla time
 
-#define numberOfPoints 20 // poziom szczegolowosci rysunku - im wiecej tym wiecej punktow w jajku TODO: naprawic dzialanie dla nieparzystych
+#define numberOfPoints 100 // poziom szczegolowosci rysunku - im wiecej tym wiecej punktow w jajku TODO: naprawic dzialanie dla nieparzystych
 
 typedef float point3[3];
+typedef float point2[2];
 /*************************************************************************************/
 
 static GLfloat theta[] = {0, 0, 0}; // trzy kąty obrotu
 
 point3 eggCords[numberOfPoints][numberOfPoints]; // tablica zawierajaca wspolrzedne punktow jajka
 point3 normalVector[numberOfPoints][numberOfPoints];
+point2 textureMapping[numberOfPoints][numberOfPoints];
 
 int spinModel = 4;
 
@@ -130,6 +132,15 @@ void countVectors() {
 	}
 }
 
+void countMappingCords() {
+	for (int i = 0; i < numberOfPoints; i++) {
+		for (int j = 0; j < numberOfPoints; j++) {
+			textureMapping[i][j][0] = (i)/((float)numberOfPoints - 1);
+			textureMapping[i][j][1] = (j)/((float)numberOfPoints - 1);
+		}
+	}
+}
+
 /**
  * Funkcja rysujaca jajko.
  */
@@ -145,19 +156,23 @@ void drawEgg() {
 			for (int j = 0; j < numberOfPoints; j++) {
 				k = 1;
 				glBegin(GL_TRIANGLES);
-				glNormal3fv(eggCords[0][0]);
+				glNormal3fv(normalVector[0][0]);
+				glTexCoord2fv(textureMapping[numberOfPoints/2][numberOfPoints/2]);
 				glVertex3fv(eggCords[0][0]);
 
 				if (j + 1 == numberOfPoints) {
-					glNormal3fv(eggCords[numberOfPoints-1][0]);
+					glNormal3fv(normalVector[numberOfPoints-1][0]);
+					glTexCoord2fv(textureMapping[numberOfPoints-1][numberOfPoints/2]);
 					glVertex3fv(eggCords[numberOfPoints-1][0]);
 				}
 				else {
-					glNormal3fv(eggCords[k][j + 1]);
+					glNormal3fv(normalVector[k][j + 1]);
+					glTexCoord2fv(textureMapping[k][j + 1]);
 					glVertex3fv(eggCords[k][j + 1]);
 				}
 
-				glNormal3fv(eggCords[k][j]);
+				glNormal3fv(normalVector[k][j]);
+				glTexCoord2fv(textureMapping[k][j]);
 				glVertex3fv(eggCords[k][j]);
 				glEnd();
 			}
@@ -165,19 +180,23 @@ void drawEgg() {
 			for (int j = 0; j < numberOfPoints; j++) {
 				k = 1;
 				glBegin(GL_TRIANGLES);
-				glNormal3fv(eggCords[0][0]);
+				glNormal3fv(normalVector[0][0]);
+				glTexCoord2fv(textureMapping[numberOfPoints/2][numberOfPoints/2]);
 				glVertex3fv(eggCords[0][0]);
 
 				if (j + 1 == numberOfPoints) {
-					glNormal3fv(eggCords[1][0]);
+					glNormal3fv(normalVector[1][0]);
+					glTexCoord2fv(textureMapping[1][numberOfPoints/2]);
 					glVertex3fv(eggCords[1][0]);
 				}
 				else {
-					glNormal3fv(eggCords[i][j + 1]);
+					glNormal3fv(normalVector[i][j + 1]);
+					glTexCoord2fv(textureMapping[i][j + 1]);
 					glVertex3fv(eggCords[i][j + 1]);
 				}
 
-				glNormal3fv(eggCords[i][j]);
+				glNormal3fv(normalVector[i][j]);
+				glTexCoord2fv(textureMapping[i][j]);
 				glVertex3fv(eggCords[i][j]);
 				glEnd();
 			}
@@ -185,18 +204,22 @@ void drawEgg() {
 			for (int j = 0; j < numberOfPoints; j++) {
 				k = numberOfPoints / 2;
 				glBegin(GL_TRIANGLES);
-				glNormal3fv(eggCords[k][0]);
+				glNormal3fv(normalVector[k][0]);
+				glTexCoord2fv(textureMapping[k][numberOfPoints/2]);
 				glVertex3fv(eggCords[k][0]);
 
-				glNormal3fv(eggCords[i][j]);
+				glNormal3fv(normalVector[i][j]);
+				glTexCoord2fv(textureMapping[i][j]);
 				glVertex3fv(eggCords[i][j]);
 
 				if (j + 1 == numberOfPoints) {
-					glNormal3fv(eggCords[k+1][0]);
+					glNormal3fv(normalVector[k+1][0]);
+					glTexCoord2fv(textureMapping[k+1][numberOfPoints/2]);
 					glVertex3fv(eggCords[k+1][0]);
 				}
 				else {
-					glNormal3fv(eggCords[i][j + 1]);
+					glNormal3fv(normalVector[i][j + 1]);
+					glTexCoord2fv(textureMapping[i][j + 1]);
 					glVertex3fv(eggCords[i][j + 1]);
 				}
 				glEnd();
@@ -205,18 +228,22 @@ void drawEgg() {
 			for (int j = 0; j < numberOfPoints; j++) {
 				k = numberOfPoints / 2 + 1;
 				glBegin(GL_TRIANGLES);
-				glNormal3fv(eggCords[i][0]);
+				glNormal3fv(normalVector[i][0]);
+				glTexCoord2fv(textureMapping[i][numberOfPoints/2]);
 				glVertex3fv(eggCords[i][0]);
 
-				glNormal3fv(eggCords[k][j]);
+				glNormal3fv(normalVector[k][j]);
+				glTexCoord2fv(textureMapping[k][j]);
 				glVertex3fv(eggCords[k][j]);
 
 				if (j + 1 == numberOfPoints) {
-					glNormal3fv(eggCords[k-2][0]);
+					glNormal3fv(normalVector[k-2][0]);
+					glTexCoord2fv(textureMapping[k-2][numberOfPoints/2]);
 					glVertex3fv(eggCords[k-2][0]);
 				}
 				else {
-					glNormal3fv(eggCords[k][j + 1]);
+					glNormal3fv(normalVector[k][j + 1]);
+					glTexCoord2fv(textureMapping[k][j + 1]);
 					glVertex3fv(eggCords[k][j + 1]);
 				}
 				glEnd();
@@ -235,24 +262,30 @@ void drawEgg() {
 				}
 
 				glBegin(GL_TRIANGLES);
-				glNormal3fv(eggCords[i][j]);
+				glNormal3fv(normalVector[i][j]);
+				glTexCoord2fv(textureMapping[i][j]);
 				glVertex3fv(eggCords[i][j]);
 
-				glNormal3fv(eggCords[k][j]);
+				glNormal3fv(normalVector[k][j]);
+				glTexCoord2fv(textureMapping[k][j]);
 				glVertex3fv(eggCords[k][j]);
 
-				glNormal3fv(eggCords[o][n]);
+				glNormal3fv(normalVector[o][n]);
+				glTexCoord2fv(textureMapping[o][n]);
 				glVertex3fv(eggCords[o][n]);
 				glEnd();
 
 				glBegin(GL_TRIANGLES);
-				glNormal3fv(eggCords[m][n]);
+				glNormal3fv(normalVector[m][n]);
+				glTexCoord2fv(textureMapping[m][n]);
 				glVertex3fv(eggCords[m][n]);
 
-				glNormal3fv(eggCords[o][n]);
+				glNormal3fv(normalVector[o][n]);
+				glTexCoord2fv(textureMapping[o][n]);
 				glVertex3fv(eggCords[o][n]);
 
-				glNormal3fv(eggCords[k][j]);
+				glNormal3fv(normalVector[k][j]);
+				glTexCoord2fv(textureMapping[k][j]);
 				glVertex3fv(eggCords[k][j]);
 				glEnd();
 			}
@@ -270,24 +303,30 @@ void drawEgg() {
 				}
 
 				glBegin(GL_TRIANGLES);
-				glNormal3fv(eggCords[i][j]);
+				glNormal3fv(normalVector[i][j]);
+				glTexCoord2fv(textureMapping[i][j]);
 				glVertex3fv(eggCords[i][j]);
 
-				glNormal3fv(eggCords[o][n]);
+				glNormal3fv(normalVector[o][n]);
+				glTexCoord2fv(textureMapping[o][n]);
 				glVertex3fv(eggCords[o][n]);
 
-				glNormal3fv(eggCords[k][j]);
+				glNormal3fv(normalVector[k][j]);
+				glTexCoord2fv(textureMapping[k][j]);
 				glVertex3fv(eggCords[k][j]);
 				glEnd();
 
 				glBegin(GL_TRIANGLES);
-				glNormal3fv(eggCords[m][n]);
+				glNormal3fv(normalVector[m][n]);
+				glTexCoord2fv(textureMapping[m][n]);
 				glVertex3fv(eggCords[m][n]);
 
-				glNormal3fv(eggCords[k][j]);
+				glNormal3fv(normalVector[k][j]);
+				glTexCoord2fv(textureMapping[k][j]);
 				glVertex3fv(eggCords[k][j]);
 
-				glNormal3fv(eggCords[o][n]);
+				glNormal3fv(normalVector[o][n]);
+				glTexCoord2fv(textureMapping[o][n]);
 				glVertex3fv(eggCords[o][n]);
 				glEnd();
 			}
@@ -357,7 +396,7 @@ void RenderScene() {
 // funkcja definiujaca obracanie bryly
 void spinEgg() {
 	if (spinModel == 1) {
-		theta[0] -= 0.05;
+		theta[0] -= 0.5;
 		theta[1] = 0;
 		theta[2] = 0;
 	}
@@ -365,7 +404,7 @@ void spinEgg() {
 
 	if (spinModel == 2) {
 		theta[0] = 0;
-		theta[1] -= 0.05;
+		theta[1] -= 0.5;
 		theta[2] = 0;
 	}
 	if( theta[1] > 360.0 ) theta[1] -= 360.0;
@@ -373,7 +412,7 @@ void spinEgg() {
 	if (spinModel == 3) {
 		theta[0] = 0;
 		theta[1] = 0;
-		theta[2] -= 0.05;
+		theta[2] -= 0.5;
 	}
 	if( theta[2] > 360.0 ) theta[2] -= 360.0;
 
@@ -592,7 +631,7 @@ void MyInit(void)
 	// położenie źródła
 
 
-	GLfloat light_ambient[] = {0.1, 0.1, 0.1, 1.0};
+	GLfloat light_ambient[] = {1, 1, 1, 1.0};
 	// składowe intensywności świecenia źródła światła otoczenia
 	// Ia = [Iar,Iag,Iab]
 
@@ -757,6 +796,7 @@ int main(int argc, char* argv[]) {
 
 	countEggCords(); // pojedyncze wywolanie wyliczen wierzcholkow jajka
 	countVectors();
+	countMappingCords();
 
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB |GLUT_DEPTH);
 
