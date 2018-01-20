@@ -9,7 +9,7 @@
 #include <cmath>
 #include <ctime> //dla time
 
-#define numberOfPoints 20 // poziom szczegolowosci rysunku - im wiecej tym wiecej punktow w jajku TODO: naprawic dzialanie dla nieparzystych
+#define numberOfPoints 250 // poziom szczegolowosci rysunku - im wiecej tym wiecej punktow w jajku TODO: naprawic dzialanie dla nieparzystych
 
 typedef float point3[3];
 typedef float point2[2];
@@ -19,7 +19,7 @@ static GLfloat theta[] = {0, 0, 0}; // trzy kąty obrotu
 
 point3 eggCords[numberOfPoints][numberOfPoints]; // tablica zawierajaca wspolrzedne punktow jajka
 point3 normalVector[numberOfPoints][numberOfPoints];
-point2 textureMapping[numberOfPoints][numberOfPoints];
+point2 textureMapping[numberOfPoints + 1][numberOfPoints];
 
 int spinModel = 4;
 
@@ -133,15 +133,10 @@ void countVectors() {
 }
 
 void countMappingCords() {
-	for (int i = 0; i < numberOfPoints; i++) {
+	for (int i = 0; i <= numberOfPoints; i++) {
 		for (int j = 0; j < numberOfPoints; j++) {
-			if (i < numberOfPoints/2) {
-				textureMapping[i][j][0] = (2*i) / ((float) numberOfPoints - 1);
-				textureMapping[i][j][1] = (j) / (((float) (numberOfPoints/2)) - 1);
-			} else {
-				textureMapping[i][j][0] = (((-1* (numberOfPoints/10)* i) + numberOfPoints - 2)) / ((float) numberOfPoints - 1);
-				textureMapping[i][j][1] = (j) / (((float) (numberOfPoints/2)) - 1) + numberOfPoints/2;
-			}
+			textureMapping[i][j][0] = (i)/((float)numberOfPoints);
+			textureMapping[i][j][1] = (j)/((float)numberOfPoints - 1);
 		}
 	}
 }
@@ -186,7 +181,7 @@ void drawEgg() {
 				k = 1;
 				glBegin(GL_TRIANGLES);
 				glNormal3fv(eggCords[0][0]);
-				glTexCoord2fv(textureMapping[i][numberOfPoints/2]);
+				glTexCoord2fv(textureMapping[20][numberOfPoints/2]);
 				glVertex3fv(eggCords[0][0]);
 
 				if (j + 1 == numberOfPoints) {
