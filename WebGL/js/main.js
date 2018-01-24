@@ -3,6 +3,7 @@ var gl_canvas;
 var gl_ctx;
 
 var _position;
+var _color;
 
 var _triangleVertexBuffer;
 var _triangleFacesBuffer;
@@ -13,7 +14,7 @@ function runWebGL () {
 	gl_ctx = gl_getContext(gl_canvas);
 	gl_initShaders();
 	gl_initBuffers();
-	// gl_draw();
+	gl_draw();
 }
 
 // pobranie kontekstu WebGL
@@ -32,16 +33,20 @@ function gl_getContext (canvas) {
 // shadery
 function gl_initShaders () {
 	var vertexShader = "\n\
-	attribute vec2 position;\n\
-	   void main(void) {\n\
-		   gl_Position = vec4(position, 0., 1.);\n\
-	}";
+    attribute vec2 position;\n\
+    attribute vec3 color;\n\
+    varying vec3 vColor;\n\
+    void main(void) {\n\
+       gl_Position = vec4(position, 0., 1.);\n\
+       vColor = color;\n\
+    }";
 
 	var fragmentShader = "\n\
-	precision mediump float;\n\
-	  void main(void) {\n\
-		  gl_FragColor = vec4(0., 0., 0., 1.);\n\
-	}";
+      precision mediump float;\n\
+      varying vec3 vColor;\n\
+      void main(void) {\n\
+         gl_FragColor = vec4(vColor, 1.);\n\
+      }";
 
 	var getShader = function(source, type, typeString) {
 		var shader = gl_ctx.createShader(type);
@@ -61,10 +66,12 @@ function gl_initShaders () {
 	var shaderProgram = gl_ctx.createProgram();
 	gl_ctx.attachShader(shaderProgram, shaderVertex);
 	gl_ctx.attachShader(shaderProgram, shaderFragment);
-
 	gl_ctx.linkProgram(shaderProgram);
+
 	_position = gl_ctx.getAttribLocation(shaderProgram, "position");
+	_color = gl_ctx.getAttribLocation(shaderProgram, "color");
 	gl_ctx.enableVertexAttribArray(_position);
+	gl_ctx.enableVertexAttribArray(_color);
 	gl_ctx.useProgram(shaderProgram);
 }
 
@@ -72,14 +79,17 @@ function gl_initShaders () {
 function gl_initBuffers () {
 	var triangleVertices = [
 		-1, -1,
+		0, 0, 1,
 		1, -1,
+		1, 1, 1,
 		1, 1,
+		1, 0, 0
 	];
 
 	_triangleVertexBuffer = gl_ctx.createBuffer();
 	gl_ctx.bindBuffer(gl_ctx.ARRAY_BUFFER, _triangleVertexBuffer);
 	gl_ctx.bufferData(gl_ctx.ARRAY_BUFFER,
-		new   Float32Array(triangleVertices),
+		new Float32Array(triangleVertices),
 		gl_ctx.STATIC_DRAW);
 
 	var triangleFaces = [0, 1, 2];
@@ -89,4 +99,24 @@ function gl_initBuffers () {
 	gl_ctx.bufferData(gl_ctx.ELEMENT_ARRAY_BUFFER,
 		new Uint16Array(triangleFaces),
 		gl_ctx.STATIC_DRAW);
+}
+
+// rysowanie
+function gl_draw() {
+	gl_ctx.clearColor(0.0, 0.0, 0.0, 0.0);
+
+	var animate = function () {
+		gl_ctx.viewport(0.0, 0.0, gl_canvas.width, gl_canvas.height);
+		gl_ctx.clear(gl_ctx.COLOR_BUFFER_BIT);
+
+		gl_ctx.vertexAttribPointer(_position, 2, gl_ctx.FLOAT, false, 4*(2+3), 0);
+		gl_ctx.vertexAttribPointer(_color, 3, gl_ctx.FLOAT, false, 4*(2+3), 2*4);
+
+		gl_ctx.bindBuffer(gl_ctx.ARRAY_BUFFER, _triangleVertexBuffer);
+		gl_ctx.bindBuffer(gl_ctx.ELEMENT_ARRAY_BUFFER, _triangleFacesBuffer);
+
+		gl_ctx.drawElements(gl_ctx.TRIANGLES, 3, gl_ctx.UNSIGNED_SHORT, 0);
+		gl_ctx.flush();
+	};
+	animate();
 }
