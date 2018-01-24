@@ -22,6 +22,8 @@ var _sampler;
 var rotationSpeed = 0.001;
 var zoomRatio = -6;
 
+var alreadyRun = false;
+
 var X, Y, Z;
 
 // funkcja główna
@@ -216,6 +218,7 @@ function gl_draw() {
 	gl_ctx.clearDepth(1.0);
 	var timeOld = 0;
 	var animate = function (time) {
+		alreadyRun = true;
 		var dAngle = rotationSpeed * (time - timeOld);
 		if (X) {
 			MATRIX.rotateX(_matrixMovement, dAngle);
@@ -245,9 +248,11 @@ function gl_draw() {
 
 		gl_ctx.bindBuffer(gl_ctx.ARRAY_BUFFER, _triangleVertexBuffer);
 		gl_ctx.bindBuffer(gl_ctx.ELEMENT_ARRAY_BUFFER, _triangleFacesBuffer);
-		gl_ctx.drawElements(gl_ctx.TRIANGLES, 5*2*3, gl_ctx.UNSIGNED_SHORT, 0);
+		gl_ctx.drawElements(gl_ctx.TRIANGLES, 6*2*3, gl_ctx.UNSIGNED_SHORT, 0);
 		gl_ctx.flush();
 		window.requestAnimationFrame(animate);
 	};
-	animate(0);
+	if (!alreadyRun) {
+		animate(0);
+	}
 }
