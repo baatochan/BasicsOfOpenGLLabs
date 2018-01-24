@@ -152,6 +152,7 @@ function gl_initBuffers () {
 		gl_ctx.STATIC_DRAW);
 
 	var triangleFaces = [
+		0, 1, 3,
 		0, 1, 2,
 		0, 2, 3,
 
