@@ -14,6 +14,10 @@ var _ViewMatrix;
 var _matrixProjection;
 var _matrixMovement;
 var _matrixView;
+var _cubeTexture;
+
+var _uv;
+var _sampler;
 
 var rotationSpeed = 0.001;
 var zoomRatio = -6;
@@ -28,6 +32,7 @@ function runWebGL () {
 	gl_initShaders();
 	gl_initBuffers();
 	gl_setMatrix();
+	_cubeTexture = gl_initTexture();
 	gl_draw();
 }
 
@@ -54,23 +59,24 @@ function gl_getContext (canvas) {
 // shadery
 function gl_initShaders () {
 	var vertexShader = "\n\
-       attribute vec3 position;\n\
-       uniform mat4 PosMatrix;\n\
-       uniform mat4 MovMatrix;\n\
-       uniform mat4 ViewMatrix; \n\
-       attribute vec3 color;\n\
-       varying vec3 vColor;\n\
-       void main(void) {\n\
-            gl_Position = PosMatrix * ViewMatrix * MovMatrix * vec4(position, 1.);\n\
-       vColor = color;\n\
-   }";
+	  attribute vec3 position;\n\
+      uniform mat4 PosMatrix;\n\
+      uniform mat4 MovMatrix;\n\
+      uniform mat4 ViewMatrix; \n\
+      attribute vec2 uv;\n\
+      varying vec2 vUV;\n\
+      void main(void) {\n\
+         gl_Position = PosMatrix * ViewMatrix * MovMatrix * vec4(position, 1.);\n\
+         vUV = uv;\n\
+	}";
 
 	var fragmentShader = "\n\
-      precision mediump float;\n\
-      varying vec3 vColor;\n\
+	  precision mediump float;\n\
+      uniform sampler2D sampler;\n\
+      varying vec2 vUV;\n\
       void main(void) {\n\
-          gl_FragColor = vec4(vColor, 1.);\n\
-   }";
+         gl_FragColor = texture2D(sampler, vUV);\n\
+	}";
 
 	var getShader = function(source, type, typeString) {
 		var shader = gl_ctx.createShader(type);
@@ -97,46 +103,44 @@ function gl_initShaders () {
 	_MovMatrix = gl_ctx.getUniformLocation(shaderProgram, "MovMatrix");
 	_ViewMatrix = gl_ctx.getUniformLocation(shaderProgram, "ViewMatrix");
 
+	_sampler = gl_ctx.getUniformLocation(shaderProgram, "sampler");
+	_uv = gl_ctx.getAttribLocation(shaderProgram, "uv");
+
 	_position = gl_ctx.getAttribLocation(shaderProgram, "position");
+	gl_ctx.enableVertexAttribArray(_uv);
 	_color = gl_ctx.getAttribLocation(shaderProgram, "color");    gl_ctx.enableVertexAttribArray(_position);
 	gl_ctx.enableVertexAttribArray(_color);
 	gl_ctx.useProgram(shaderProgram);
+	gl_ctx.uniform1i(_sampler, 0);
 }
 
 // bufory
 function gl_initBuffers () {
 	var triangleVertices = [
-		-1,-1,-1,     0, 0, 1,    // 1 ściana: niebieska
-		1,-1,-1,     0, 0, 1,
-		1, 1,-1,     0, 0, 1,
-		-1, 1,-1,     0, 0, 1,
-
-
-
-		-1,-1, 1,     0, 1, 0,    // 2 ściana: zielona
-		1,-1, 1,     0, 1, 0,
-		1, 1, 1,     0, 1, 0,
-		-1, 1, 1,     0, 1, 0,
-
-		-1,-1,-1,     1, 0, 0,    // 3 ściana: czerwona
-		-1, 1,-1,     1, 0, 0,
-		-1, 1, 1,     1, 0, 0,
-		-1,-1, 1,     1, 0, 0,
-
-		1,-1,-1,     1, 1, 0,    // 4 ściana: zółta
-		1, 1,-1,     1, 1, 0,
-		1, 1, 1,     1, 1, 0,
-		1,-1, 1,     1, 1, 0,
-
-		-1,-1,-1,     0, 1, 1,    // 5 ściana: błękitna
-		-1,-1, 1,     0, 1, 1,
-		1,-1, 1,     0, 1, 1,
-		1,-1,-1,     0, 1, 1,
-
-		-1, 1,-1,     1, 0, 1,    // 6 ściana: różowa
-		-1, 1, 1,     1, 0, 1,
-		1, 1, 1,     1, 0, 1,
-		1, 1,-1,     1, 0, 1
+		-1,-1,-1,     0, 0,
+		1,-1,-1,     1, 0,
+		1, 1,-1,     1, 1,
+		-1, 1,-1,     0, 1,
+		-1,-1, 1,     0, 0,
+		1,-1, 1,     1, 0,
+		1, 1, 1,     1, 1,
+		-1, 1, 1,     0, 1,
+		-1,-1,-1,     0, 0,
+		-1, 1,-1,     1, 0,
+		-1, 1, 1,     1, 1,
+		-1,-1, 1,     0, 1,
+		1,-1,-1,     0, 0,
+		1, 1,-1,     1, 0,
+		1, 1, 1,     1, 1,
+		1,-1, 1,     0, 1,
+		-1,-1,-1,     0, 0,
+		-1,-1, 1,     1, 0,
+		1,-1, 1,     1, 1,
+		1,-1,-1,     0, 1,
+		-1, 1,-1,     0, 0,
+		-1, 1, 1,     1, 0,
+		1, 1, 1,     1, 1,
+		1, 1,-1,     0, 1
 	];
 
 	_triangleVertexBuffer = gl_ctx.createBuffer();
@@ -181,6 +185,29 @@ function gl_setMatrix () {
 	MATRIX.translateZ(_matrixView, zoomRatio);
 }
 
+// tekstura
+
+function gl_initTexture() {
+	var img = new Image();
+	img.src = 'cubeTexture.png';
+	img.webglTexture = false;
+
+	img.onload = function(e) {
+		var texture = gl_ctx.createTexture();
+
+		gl_ctx.pixelStorei(gl_ctx.UNPACK_FLIP_Y_WEBGL, true);
+		gl_ctx.bindTexture(gl_ctx.TEXTURE_2D, texture);
+		gl_ctx.texParameteri(gl_ctx.TEXTURE_2D, gl_ctx.TEXTURE_MIN_FILTER, gl_ctx.LINEAR);
+		gl_ctx.texParameteri(gl_ctx.TEXTURE_2D, gl_ctx.TEXTURE_MAG_FILTER, gl_ctx.LINEAR);
+
+		gl_ctx.texImage2D(gl_ctx.TEXTURE_2D, 0, gl_ctx.RGBA, gl_ctx.RGBA,
+			gl_ctx.UNSIGNED_BYTE, img);
+		gl_ctx.bindTexture(gl_ctx.TEXTURE_2D, null);
+		img.webglTexture = texture;
+	};
+	return img;
+}
+
 // rysowanie
 function gl_draw() {
 	gl_ctx.clearColor(0.0, 0.0, 0.0, 0.0);
@@ -208,13 +235,17 @@ function gl_draw() {
 		gl_ctx.uniformMatrix4fv(_MovMatrix, false, _matrixMovement);
 		gl_ctx.uniformMatrix4fv(_ViewMatrix, false, _matrixView);
 
-		gl_ctx.vertexAttribPointer(_position, 3, gl_ctx.FLOAT, false, 4*(3+3), 0);
-		gl_ctx.vertexAttribPointer(_color, 3, gl_ctx.FLOAT, false, 4*(3+3), 3*4);
+		if (_cubeTexture.webglTexture) {
+			gl_ctx.activeTexture(gl_ctx.TEXTURE0);
+			gl_ctx.bindTexture(gl_ctx.TEXTURE_2D, _cubeTexture.webglTexture);
+		}
+
+		gl_ctx.vertexAttribPointer(_position, 3, gl_ctx.FLOAT, false, 4*(3+2), 0);
+		gl_ctx.vertexAttribPointer(_uv, 2, gl_ctx.FLOAT, false, 4*(3+2), 3*4);
 
 		gl_ctx.bindBuffer(gl_ctx.ARRAY_BUFFER, _triangleVertexBuffer);
 		gl_ctx.bindBuffer(gl_ctx.ELEMENT_ARRAY_BUFFER, _triangleFacesBuffer);
-		gl_ctx.drawElements(gl_ctx.TRIANGLES, 6*2*3, gl_ctx.UNSIGNED_SHORT, 0);
-
+		gl_ctx.drawElements(gl_ctx.TRIANGLES, 5*2*3, gl_ctx.UNSIGNED_SHORT, 0);
 		gl_ctx.flush();
 		window.requestAnimationFrame(animate);
 	};
