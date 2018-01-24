@@ -4,12 +4,15 @@ var gl_ctx;
 
 var _position;
 
+var _triangleVertexBuffer;
+var _triangleFacesBuffer;
+
 // funkcja główna
 function runWebGL () {
 	gl_canvas = document.getElementById("glcanvas");
 	gl_ctx = gl_getContext(gl_canvas);
 	gl_initShaders();
-	// gl_initBuffers();
+	gl_initBuffers();
 	// gl_draw();
 }
 
@@ -63,4 +66,27 @@ function gl_initShaders () {
 	_position = gl_ctx.getAttribLocation(shaderProgram, "position");
 	gl_ctx.enableVertexAttribArray(_position);
 	gl_ctx.useProgram(shaderProgram);
+}
+
+// bufory
+function gl_initBuffers () {
+	var triangleVertices = [
+		-1, -1,
+		1, -1,
+		1, 1,
+	];
+
+	_triangleVertexBuffer = gl_ctx.createBuffer();
+	gl_ctx.bindBuffer(gl_ctx.ARRAY_BUFFER, _triangleVertexBuffer);
+	gl_ctx.bufferData(gl_ctx.ARRAY_BUFFER,
+		new   Float32Array(triangleVertices),
+		gl_ctx.STATIC_DRAW);
+
+	var triangleFaces = [0, 1, 2];
+
+	_triangleFacesBuffer = gl_ctx.createBuffer();
+	gl_ctx.bindBuffer(gl_ctx.ELEMENT_ARRAY_BUFFER, _triangleFacesBuffer);
+	gl_ctx.bufferData(gl_ctx.ELEMENT_ARRAY_BUFFER,
+		new Uint16Array(triangleFaces),
+		gl_ctx.STATIC_DRAW);
 }
