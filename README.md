@@ -18,11 +18,20 @@ To make use of `*.zip` files just extract them and open `index.html`. Sometimes 
 
 Every single `*.cpp` file in `/` is one single task. There are two groups of those
 tasks:
-* `lab#-#.cpp` are tasks copy-pasted from lab task instructions,
+* `lab#-#.cpp/zip` are tasks copy-pasted from lab task instructions,
 * others are tasks that we had to do by ourselves and those were:
   * `sierpinskiCarpet.cpp` - simple app that draws Sierpinski carpet (user can
     chose number of steps and perturbation level),
-  * TODO: others
+  * `egg.cpp` - app that draws egg model,
+  * `teapot.cpp` - app that draws teapot that you can move with a mouse,
+  * `egg-cameraMouseSpin.cpp` - app that draws egg that you can move with a mouse,
+  * `egg-light.cpp` - app that draws egg and puts a light on the object,
+  * `egg-lightMovement.cpp` - app that puts two light sources on the egg model which position can be change with a mouse,
+  * `tetrahedron-texture-mapping.cpp` - app with a tetrahedron that have mapped texture on,
+  * `egg-texture-mapping.cpp` - app with an egg model that have mapped texture on,
+  * `WebGL-tetrahedron.zip` - webGL app that draws a tetrahedron,
+  * `WebGL-slowDownAnimation.zip` - webGL app that draws a cube with a texture mapped on and fixed bug that makes it spin faster every time you re-run it.
+
 
 ## CLion Configuration
 
