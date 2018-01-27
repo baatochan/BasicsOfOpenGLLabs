@@ -1,14 +1,18 @@
 # Basics of OpenGL labs
 Few OpenGL apps written in C++ during OpenGL course at the University (grafika komputerowa).
 
+The last class was about WebGL and files from that class are included in this repo as well.
+
 Author: Bartosz Rodziewicz
 
 ## Map of the repo
 
 This repo consists of `grafika/` folder which is CLion project and single `*.cpp`
-files in `/`.
+files in `/`. `*.zip` files contains WebGL stuff.
 
 To make use of `*.cpp` files take the one you want to open, change the name to `main.cpp` and paste it in `grafika/`. Then run CLion, compile and run.
+
+To make use of `*.zip` files just extract them and open `index.html`. Sometimes you may need to use browser different than Chrome (especially for `lab7-6.zip`).
 
 ## Tasks done during the course
 
