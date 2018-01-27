@@ -7,8 +7,7 @@ Author: Bartosz Rodziewicz
 
 ## Map of the repo
 
-This repo consists of `grafika/` folder which is CLion project and single `*.cpp`
-files in `/`. `*.zip` files contains WebGL stuff.
+This repo consists of `grafika/` directory which is CLion project and single `*.cpp` files in `/`. `*.zip` files contains WebGL stuff. `tekstury` directory contains image files that can be used as a textures for some of the tasks. `LabTasks` directory contains lab task descriptions (in Polish).
 
 To make use of `*.cpp` files take the one you want to open, change the name to `main.cpp` and paste it in `grafika/`. Then run CLion, compile and run.
 
@@ -43,5 +42,5 @@ plugins.
   * [glib](http://ftp.gnome.org/pub/gnome/binaries/win32/glib/2.28/glib_2.28.8-1_win32.zip)
   * [gettext-runtime](http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/gettext-runtime_0.18.1.1-2_win32.zip)
   * [freeglut](http://files.transmissionzero.co.uk/software/development/GLUT/freeglut-MinGW-3.0.0-1.mp.zip)
-* Unpack them to MinGW folder (where MinGW is installed).
+* Unpack them to MinGW directory (where MinGW is installed).
 * Looks like it's all you have to do.
