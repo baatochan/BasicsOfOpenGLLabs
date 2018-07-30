@@ -1,9 +1,9 @@
-# Basics of OpenGL labs
-Few OpenGL apps written in C++ during OpenGL course at the University (grafika komputerowa).
-
-The last class was about WebGL and files from that class are included in this repo as well.
+# Basics of OpenGL Labs
+Few OpenGL apps written in C++ during OpenGL course (Grafika Komputerowa) at the university.
 
 Author: Bartosz Rodziewicz
+
+The last class was about WebGL and files from that class are included in this repo as well.
 
 ## Map of the repo
 
@@ -15,8 +15,7 @@ To make use of `*.zip` files just extract them and open `index.html`. Sometimes 
 
 ## Tasks done during the course
 
-Every single `*.cpp` file in `/` is one single task. There are two groups of those
-tasks:
+Every single `*.cpp` file in `/` is one single task. There are two groups of those tasks:
 * `lab#-#.cpp/zip` are tasks copy-pasted from lab task instructions,
 * others are tasks that we had to do by ourselves and those were:
   * `sierpinskiCarpet.cpp` - simple app that draws Sierpinski carpet (user can
@@ -34,8 +33,7 @@ tasks:
 
 ## CLion Configuration
 
-Before running those files in CLion you have to configure it and install required
-plugins.
+Before running those files in CLion you have to configure it and install required plugins.
 * Make sure you use CLion with MinGW.
 * Download required plugins:
   * [pkg-config](http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/pkg-config_0.26-1_win32.zip)
